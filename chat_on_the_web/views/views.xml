@@ -2,7 +2,7 @@
   <data>
     <!-- explicit list view definition -->
     
-    <record model="ir.ui.view" id="chat.web.list">
+    <record model="ir.ui.view" id="chat_on_the_web.list">
       <field name="name">chat.web list</field>
       <field name="model">chat.web</field>
       <field name="arch" type="xml">
@@ -17,7 +17,7 @@
 
     <!-- actions opening views on models -->
   
-    <record model="ir.actions.act_window" id="chat.web.action_window">
+    <record model="ir.actions.act_window" id="chat_on_the_web.action_window">
       <field name="name">chat.web window</field>
       <field name="res_model">chat.web</field>
       <field name="view_mode">tree,form</field>
@@ -26,7 +26,7 @@
 
     <!-- server action to the one above -->
     
-    <record model="ir.actions.server" id="chat.web.action_server">
+    <record model="ir.actions.server" id="chat_on_the_web.action_server">
       <field name="name">chat.web server</field>
       <field name="model_id" ref="model_chat.web_chat.web"/>
       <field name="state">code</field>
