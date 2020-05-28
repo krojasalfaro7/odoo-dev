@@ -6,7 +6,7 @@ class chat_on_the_web(models.Model):
     _name = 'chat_on_the_web.chat_on_the_web'
     _inherit = 'mail.thread'
 
-    name = fields.Char(string="Nombre del chatmodleo ")
+    name = fields.Char(string="Nombre del chat modelo ")
     value = fields.Integer()
     value2 = fields.Float(compute="_value_pc", store=True)
     description = fields.Text()
