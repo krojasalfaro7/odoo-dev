@@ -1,0 +1,20 @@
+<odoo>
+<data>
+<template id="inventory_limits_on_the_web" 
+          name="Extended for website_sale.product" 
+          inherit_id="website_sale.product">
+
+       <xpath expr="//div[@class='js_product']/t" position="replace">
+   		<t t-if="false">
+                </t> </xpath>
+
+        <xpath expr="//div[@class='js_product']/t" position="before">
+        	<input type="hidden" class="product_id" name="product_id" t-att-value="product.product_variant_id.id if len(product.product_variant_ids) == 1 else '0'"/>
+                  <t t-call="website_sale.variants">
+                    <t t-set="ul_class" t-value="'nav-stacked'"/>
+                  </t>
+        </xpath>
+</template>
+</data>
+</odoo>
+

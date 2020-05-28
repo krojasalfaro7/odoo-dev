@@ -1,0 +1,23 @@
+<odoo>
+<data>
+<template id="chat_on_the_web_external_lib" 
+          name="Extension para im_livechat" 
+          inherit_id="im_livechat.external_lib">
+
+<xpath expr="//script[@src='/im_livechat/static/src/js/im_livechat.js']" position="replace">
+    <script type="text/javascript" src="/chat_on_the_web/static/src/js/im_livechat.js"></script>
+</xpath>
+
+</template>
+<template id="chat_on_the_web_assets_frontend" 
+          name="Extension para website_livechat" 
+          inherit_id="website_livechat.assets_frontend">
+
+<xpath expr="//script[@src='/im_livechat/static/src/js/im_livechat.js']" position="replace">
+    <script type="text/javascript" src="/chat_on_the_web/static/src/js/im_livechat.js"></script>
+</xpath>
+
+</template>
+
+</data>
+</odoo>

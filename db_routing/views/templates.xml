@@ -1,0 +1,22 @@
+<odoo>
+    <data>
+        <template 
+            id="db_routing"
+            name="Extend for web.login"
+            inherit_id="web.login">
+
+            <!--Ocultando al cliente la selección de la base de datos en la pagina de web login-->
+            <xpath expr="//div[@class='form-group field-db']" position="replace">
+                <div style="display:none;" class="form-group field-db" t-if="databases and len(databases) &gt; 1">
+                    <label for="db" class="control-label">Database</label>
+                    <div class="input-group">
+                        <input type="text" name="db" t-att-value="request.db" id="db" class="form-control" required="required" readonly="readonly"/>
+                        <span class="input-group-btn">
+                          <a href="/web/database/selector" class="btn btn-default">Select <i class="fa fa-database"></i></a>
+                        </span>
+                    </div>
+                </div>
+            </xpath>
+        </template>
+    </data>
+</odoo>
