@@ -1,13 +1,18 @@
 <odoo>
 <data>
+<!--Extendiendo la vista website_sale.product para realizar las modificaciones de la etiqueta t-placeholder-->
 <template id="inventory_limits_on_the_web" 
           name="Extended for website_sale.product" 
           inherit_id="website_sale.product">
 
+<!--Condificonal if necesaria, ya que al momento del replace, para otros modulos, este condicional no es transparente y hace falta para que no dé error de bloques-->
+<!--Se realiza una busqueda por la clase 'js_product' en las etiquetas div, y luego dentro de la primera etiqueta t correspondiente al elemento que se desea suprimir-->
+<!--Se realiza un replace para suprimir la etiqueta donde se encuentra t-placeholder e incorporando un condicional necesario para los proximos elemntos-->
        <xpath expr="//div[@class='js_product']/t" position="replace">
    		<t t-if="false">
                 </t> </xpath>
-
+<!--Aquí se extrae los elementos dentro de la etiqueta t-placeholder para que pueda ser encontrado por el condicional de variantes de productos-->
+<!--Estos elementos se colocan antes de las llamadas posteriores para respetar el orden de como está originalmente en el codigo-->
         <xpath expr="//div[@class='js_product']/t" position="before">
         	<input type="hidden" class="product_id" name="product_id" t-att-value="product.product_variant_id.id if len(product.product_variant_ids) == 1 else '0'"/>
                   <t t-call="website_sale.variants">
