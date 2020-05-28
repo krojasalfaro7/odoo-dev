@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from odoo import http
-
+"""
 class ChatOnTheWeb(http.Controller):
     @http.route('/chat_on_the_web/chat_on_the_web/', auth='public')
     def index(self, **kw):
@@ -17,4 +17,4 @@ class ChatOnTheWeb(http.Controller):
     def object(self, obj, **kw):
         return http.request.render('chat_on_the_web.object', {
             'object': obj
-        })
+        })"""
