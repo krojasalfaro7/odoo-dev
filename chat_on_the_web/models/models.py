@@ -4,6 +4,7 @@ from odoo import models, fields, api
 
 class chat_on_the_web(models.Model):
     _name = 'chat_on_the_web.chat_on_the_web'
+    _inherit = 'mail.thread'
 
     name = fields.Char(string="Nombre del chatmodleo ")
     value = fields.Integer()
