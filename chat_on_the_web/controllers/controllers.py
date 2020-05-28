@@ -10,10 +10,10 @@ class ChatOnTheWeb(http.Controller):
     def list(self, **kw):
         return http.request.render('chat_on_the_web.listing', {
                     'root': '/chat_on_the_web/chat_on_the_web',
-            'objects': http.request.env['chat_on_the_web.chat_on_the_web'].search([]),
+            'objects': http.request.env['chat.web'].search([]),
         })
 
-    @http.route('/chat_on_the_web/chat_on_the_web/objects/<model("chat_on_the_web.chat_on_the_web"):obj>/', auth='public')
+    @http.route('/chat_on_the_web/chat_on_the_web/objects/<model("chat.web"):obj>/', auth='public')
     def object(self, obj, **kw):
         return http.request.render('chat_on_the_web.object', {
             'object': obj
