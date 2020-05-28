@@ -1,23 +1,22 @@
 <odoo>
-<data>
-<template id="chat_on_the_web_external_lib" 
-          name="Extension para im_livechat" 
-          inherit_id="im_livechat.external_lib">
-
-<xpath expr="//script[@src='/im_livechat/static/src/js/im_livechat.js']" position="replace">
-    <script type="text/javascript" src="/chat_on_the_web/static/src/js/im_livechat.js"></script>
-</xpath>
-
-</template>
-<template id="chat_on_the_web_assets_frontend" 
-          name="Extension para website_livechat" 
-          inherit_id="website_livechat.assets_frontend">
-
-<xpath expr="//script[@src='/im_livechat/static/src/js/im_livechat.js']" position="replace">
-    <script type="text/javascript" src="/chat_on_the_web/static/src/js/im_livechat.js"></script>
-</xpath>
-
-</template>
-
-</data>
+    <data>
+        <!-- <template id="listing"> -->
+        <!--   <ul> -->
+        <!--     <li t-foreach="objects" t-as="object"> -->
+        <!--       <a t-attf-href="#{ root }/objects/#{ object.id }"> -->
+        <!--         <t t-esc="object.display_name"/> -->
+        <!--       </a> -->
+        <!--     </li> -->
+        <!--   </ul> -->
+        <!-- </template> -->
+        <!-- <template id="object"> -->
+        <!--   <h1><t t-esc="object.display_name"/></h1> -->
+        <!--   <dl> -->
+        <!--     <t t-foreach="object._fields" t-as="field"> -->
+        <!--       <dt><t t-esc="field"/></dt> -->
+        <!--       <dd><t t-esc="object[field]"/></dd> -->
+        <!--     </t> -->
+        <!--   </dl> -->
+        <!-- </template> -->
+    </data>
 </odoo>
