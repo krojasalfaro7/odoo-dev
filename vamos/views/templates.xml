@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+                                        <!--BACKEND-->
+    <!-- the js code to initialize the LiveSupport object -->
+    <template id="cargar" name="ChatWeb : Agregando la funcionalidad del boton">
+        <!--<t t-translation="off">-->
+        <t t-if="not info">
+            <t t-set="info" t-value="request.env['chat_web.channel'].get_livechat_info(channel)"/>
+        </t>
+            document.addEventListener("DOMContentLoaded", function(event) {
+            console.log("Agregando un evento que escucha ....");
+                <t t-if="web_session_required">
+                odoo.define('web.session', function (require) {
+                    var Session = require('web.Session');
+                    var modules = odoo._modules;
+                    return new Session(undefined, "<t t-esc="info['server_url']"/>", {modules:modules, use_cors: false});
+                });
+                </t>
+
+                odoo.define('im_livechat.livesupport', function (require) {
+                console.log("Hablando desde el template");
+        <t t-if="info['available']" t-translation="off">
+                    var im_livechat = require('chat_window.chat_window');
+                    var button = new im_livechat.LivechatButton(
+                        $('body'),
+                        "<t t-esc="info['server_url']"/>",
+                        <t t-raw="json.dumps(info.get('options', {}))"/>
+                    );
+                    button.appendTo($('body'));
+                    window.livechat_button = button;
+        </t>
+                });
+            });
+        <!--</t>-->
+    </template>
+                                         <!--BACKEND-->
+    </data>
+</odoo>

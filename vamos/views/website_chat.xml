@@ -1,0 +1,17 @@
+<odoo>
+  <data>
+                                         <!--FRONTEND-->
+  <template id="loader" inherit_id="website.layout" name="ChatWeb : Incluyendo el cargador en la Website">
+      <xpath expr="//div[@id='wrapwrap']" position="after">
+          <t t-if="website.channel_id.sudo().search([]) and website">
+              <script>
+                  <t t-call="vamos.cargar">
+                      <t t-set="channel" t-value="website.channel_id.sudo().search([])[0].id"/>
+                  </t>
+              </script>
+          </t>
+      </xpath>
+  </template>
+                                        <!--FRONTEND-->
+</data>
+</odoo>

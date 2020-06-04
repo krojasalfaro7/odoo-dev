@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+     <data>
+
+         <record id="chat_web_channel_data_website" model="chat_web.channel">
+             <field name="name">CanalDePrueba</field>
+             <field name="default_message">¿Como podemos ayudarte?</field>
+         </record>
+
+         <record id="website.default_website" model="website">
+             <field name="channel_id" ref="vamos.chat_web_channel_data_website"></field>
+         </record>
+
+     </data>
+</odoo>
