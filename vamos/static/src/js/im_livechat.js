@@ -1,7 +1,7 @@
 odoo.define('chat_window.chat_window', function (require) {
 "use strict";
 
-//var local_storage = require('web.local_storage');
+var local_storage = require('web.local_storage');
 var bus = require('bus.bus').bus;
 var concurrency = require('web.concurrency');
 var config = require('web.config');
@@ -11,7 +11,9 @@ var time = require('web.time');
 var utils = require('web.utils');
 var Widget = require('web.Widget');
 
+var dom = require('web.dom');
 var ChatWindow = require('mail.ChatWindow');
+//var data = require('web.data');
 
 var _t = core._t;
 var QWeb = core.qweb;
@@ -35,18 +37,22 @@ if (!_.contains(url_history, page)) {
     utils.set_cookie(LIVECHAT_COOKIE_HISTORY, JSON.stringify(url_history), 60*60*24); // 1 day cookie
 }
 
-console.log("todo bien hasta aqui");
-
-
 var LivechatButton = Widget.extend({
-    className:"openerp o_livechat_button hidden-print",
+    //className:"openerp o_livechat_button hidden-print",
+    className:"o_livechat_button_image",
 
     events: {
-        "click": "open_chat"
+        "click": "open_chat",
+        "click .o_attachment_download": "_onAttachmentDownload",
     },
 
     init: function (parent, server_url, options) {
-        console.log("init");
+        console.log("=================================================init========================================");
+        console.log("_____________________________argumentos pasados a init__________________________________");
+        console.log(parent);
+        console.log(server_url);
+        console.log(options);
+        console.log("_____________________________argumentos pasados a init__________________________________");
         this._super(parent);
         this.options = _.defaults(options || {}, {
             input_placeholder: _t('Ask something ...'),
@@ -54,18 +60,23 @@ var LivechatButton = Widget.extend({
             button_text: _t("Chat with one of our collaborators"),
             default_message: _t("How may I help you?"),
         });
+        console.log(this.options);
         this.channel = null;
         this.chat_window = null;
         this.messages = [];
         this.server_url = server_url;
+        console.log("=================================================init========================================");
     },
 
     willStart: function () {
-        console.log("willStart");
+        console.log("==============================================willStart=======================================");
         var self = this;
         var cookie = utils.get_cookie('im_livechat_session');
+        console.log("cookie: "+ cookie);
         var ready;
         if (!cookie) {
+            console.log("Cookie no establecido....");
+            console.log("channel_id: "+this.options.channel_id);
             ready = session.rpc("/im_livechat/init", {channel_id: this.options.channel_id}).then(function (result) {
                 if (!result.available_for_me) {
                     return $.Deferred().reject();
@@ -74,18 +85,27 @@ var LivechatButton = Widget.extend({
             });
         } else {
             var channel = JSON.parse(cookie);
+            console.log(channel);
+            console.log("channel: "+channel.uuid);
             ready = session.rpc("/mail/chat_history", {uuid: channel.uuid, limit: 100}).then(function (history) {
                 self.history = history;
             });
         }
+        console.log("==============================================willStart=======================================");
         return ready.then(this.load_qweb_template.bind(this));
     },
 
     start: function () {
-        console.log("start");
-        this.$el.text(this.options.button_text);
+        console.log("======================================start===================================================");
+
+        //this.$el.text(this.options.button_text);
+        //Editando el $el para que aparezca el icono de sobre en vez de un boton con un texto.
+        this.$el.append("<input type='image' src='/vamos/static/src/img/icono_mensaje.png' class='o_input_sobre'></input>");
         var small_screen = config.device.size_class === config.device.SIZES.XS;
         if (this.history) {
+            console.log("Hay historial de mensajes");
+            console.log(this.history);
+            console.log(this.history.reverse());
             _.each(this.history.reverse(), this.add_message.bind(this));
             this.open_chat();
         } else if (!small_screen && this.rule.action === 'auto_popup') {
@@ -100,10 +120,12 @@ var LivechatButton = Widget.extend({
                 self._on_notification(notification);
             });
         });
+        console.log("======================================start===================================================");
         return this._super();
     },
     _on_notification: function(notification){
-        console.log("_on_notification");
+        console.log("=================================_on_notification=============================================");
+        console.log(notification);
         if (this.channel && (notification[0] === this.channel.uuid)) {
             if(notification[1]._type === "history_command") { // history request
                 var cookie = utils.get_cookie(LIVECHAT_COOKIE_HISTORY);
@@ -114,6 +136,7 @@ var LivechatButton = Widget.extend({
                     page_history: history,
                 });
             }else{ // normal message
+                console.log(notification[1]);
                 this.add_message(notification[1]);
                 this.render_messages();
                 if (this.chat_window.folded || !this.chat_window.thread.is_at_bottom()) {
@@ -121,9 +144,10 @@ var LivechatButton = Widget.extend({
                 }
             }
         }
+        console.log("=================================_on_notification============================================="); 
     },
     load_qweb_template: function(){
-        console.log("load_qweb_template");
+        console.log("========================================load_qweb_template======================================");
         var xml_files = ['/mail/static/src/xml/chat_window.xml',
                          '/mail/static/src/xml/thread.xml',
                          '/vamos/static/src/xml/im_livechat.xml'];
@@ -132,6 +156,7 @@ var LivechatButton = Widget.extend({
                 QWeb.add_template(xml);
             });
         });
+        console.log("========================================load_qweb_template======================================");
         return $.when.apply($, defs);
     },
 
@@ -175,7 +200,7 @@ var LivechatButton = Widget.extend({
     }, 200, true),
 
     open_chat_window: function (channel) {
-        console.log("open_chat_window");
+        console.log("=========================================open_chat_window===========================");
         var self = this;
         var options = {
             display_stars: false,
@@ -214,6 +239,7 @@ var LivechatButton = Widget.extend({
                 self.chat_window.update_unread(0);
             }
         }, 100));
+        console.log("=========================================open_chat_window===========================");
     },
 
     close_chat: function () {
@@ -233,7 +259,7 @@ var LivechatButton = Widget.extend({
     },
 
     add_message: function (data, options) {
-        console.log("add_message");
+        console.log("=================================add_message================================================");
         var msg = {
             id: data.id,
             attachment_ids: data.attachment_ids,
@@ -244,6 +270,7 @@ var LivechatButton = Widget.extend({
             is_note: data.is_note,
             customer_email_data: []
         };
+        console.log(msg);
         var hasAlreadyMessage = _.some(this.messages, function (message) {
             return message.id === msg.id;
         });
@@ -251,8 +278,7 @@ var LivechatButton = Widget.extend({
             return;
         }
         // Compute displayed author name or email
-        msg.displayed_author = msg.author_id && msg.author_id[1] ||
-                               this.options.default_username;
+        msg.displayed_author = msg.author_id && msg.author_id[1] || this.options.default_username;
 
         // Compute the avatar_url
         msg.avatar_src = this.server_url;
@@ -267,15 +293,17 @@ var LivechatButton = Widget.extend({
         } else {
             this.messages.push(msg);
         }
+    console.log("=================================add_message================================================");
     },
 
     render_messages: function () {
-        console.log("render_messages");
+        console.log("=====================================render_messages======================================");
         var should_scroll = !this.chat_window.folded && this.chat_window.thread.is_at_bottom();
         this.chat_window.render(this.messages);
         if (should_scroll) {
             this.chat_window.thread.scroll_to();
         }
+        console.log("=====================================render_messages======================================");
     },
 
     send_welcome_message: function () {
@@ -291,6 +319,10 @@ var LivechatButton = Widget.extend({
                 tracking_value_ids: [],
             }, {prepend: true});
         }
+    },
+
+    _onAttachmentDownload: function (event) {
+        event.stopPropagation();
     },
 
     ask_feedback: function () {
@@ -318,6 +350,14 @@ var Feedback = Widget.extend({
         'click .o_livechat_rating_choices img': 'on_click_smiley',
         'click .o_livechat_no_feedback em': 'on_click_no_feedback',
         'click .o_rating_submit_button': 'on_click_send',
+        //"click .o_composer_button_add_attachment": "on_click_add_attachment",
+        "click .o_composer_button_add_attachment": "on_attachment_change",
+
+        
+        //"change input.o_input_file": "on_attachment_change",
+        "click .o_attachment_download": "_onAttachmentDownload",
+
+
     },
 
     init: function (parent, channel_uuid) {
@@ -326,6 +366,162 @@ var Feedback = Widget.extend({
         this.server_origin = session.origin;
         this.rating = undefined;
         this.dp = new concurrency.DropPrevious();
+
+        this.options = {
+            commands_enabled: true,
+            context: {},
+            input_baseline: 18,
+            input_max_height: 150,
+            input_min_height: 28,
+            mention_fetch_limit: 8,
+            mention_partners_restricted: false, // set to true to only suggest prefetched partners
+            send_text: _t('Send'),
+            default_body: '',
+            default_mention_selections: {},
+            isMobile: config.device.isMobile
+        };
+        this.context = this.options.context;
+
+                // Attachments
+        //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
+        this.fileupload_id = _.uniqueId('o_chat_fileupload');
+        this.set('attachment_ids', options.attachment_ids || []);
+
+    },
+
+
+    start: function () {
+        var self = this;
+        this.$attachment_button = this.$(".o_composer_button_add_attachment");
+        this.$attachments_list = this.$('.o_composer_attachments_list');
+        //this.$input = this.$('.o_composer_input textarea');
+        //this.$input.focus(function () {
+         //   self.trigger('input_focused');
+        //});
+        //this.$input.val(this.options.default_body);
+        //dom.autoresize(this.$input, {parent: this, min_height: this.options.input_min_height});
+
+        // Attachments
+        //this.render_attachments();
+        //$(window).on(this.fileupload_id, this.on_attachment_loaded);
+        
+        //this.on("change:attachment_ids", this, this.render_attachments);
+        
+
+        // Mention
+        //this.mention_manager.prependTo(this.$('.o_composer'));
+
+        //return this._super();
+    },
+
+
+        // Attachments
+    on_attachment_change: function(event) {
+        console.log("==========================================on_attachment_change==============================================");
+        var self = this,
+            files = event.target.files,
+            attachments = self.get('attachment_ids');
+            console.log(attachments);
+
+        _.each(files, function(file){
+            var attachment = _.findWhere(attachments, {name: file.name});
+            // if the files already exits, delete the file before upload
+            if(attachment){
+                //self.AttachmentDataSet.unlink([attachment.id]);
+                attachments = _.without(attachments, attachment);
+            }
+        });
+
+        this.$('form.o_form_binary_form').submit();
+        this.$attachment_button.prop('disabled', true);
+        var upload_attachments = _.map(files, function(file){
+            return {
+                'id': 0,
+                'name': file.name,
+                'filename': file.name,
+                'url': '',
+                'upload': true,
+                'mimetype': '',
+            };
+        });
+        attachments = attachments.concat(upload_attachments);
+        this.set('attachment_ids', attachments);
+        event.target.value = "";
+    },
+
+    _onAttachmentDownload: function (event) {
+        event.stopPropagation();
+    },
+
+    on_attachment_loaded: function(event) {
+        console.log("on_attachment_loaded");
+        var self = this,
+            attachments = this.get('attachment_ids'),
+            files = Array.prototype.slice.call(arguments, 1);
+
+        _.each(files, function(file){
+            if(file.error || !file.id){
+                this.do_warn(file.error);
+                attachments = _.filter(attachments, function (attachment) { return !attachment.upload; });
+            }else{
+                var attachment = _.findWhere(attachments, {filename: file.filename, upload: true});
+                if(attachment){
+                    attachments = _.without(attachments, attachment);
+                    attachments.push({
+                        'id': file.id,
+                        'name': file.name || file.filename,
+                        'filename': file.filename,
+                        'mimetype': file.mimetype,
+                        'url': session.url('/web/content', {'id': file.id, download: true}),
+                    });
+                }
+            }
+        }.bind(this));
+        this.set('attachment_ids', attachments);
+        this.$attachment_button.prop('disabled', false);
+    },
+    on_attachment_delete: function(event){
+        console.log("on_attachment_delete");
+        event.stopPropagation();
+        var self = this;
+        var attachment_id = $(event.target).data("id");
+        if (attachment_id) {
+            var attachments = [];
+            _.each(this.get('attachment_ids'), function(attachment){
+                if (attachment_id !== attachment.id) {
+                    attachments.push(attachment);
+                } else {
+                    //self.AttachmentDataSet.unlink([attachment_id]);
+                }
+            });
+            this.set('attachment_ids', attachments);
+            this.$('input.o_input_file').val('');
+        }
+    },
+    do_check_attachment_upload: function () {
+        console.log("do_check_attachment_upload");
+        if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
+            this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
+            return false;
+        }
+        return true;
+    },
+    render_attachments: function() {
+        console.log("render_attachments");
+        this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
+            attachments: this.get('attachment_ids'),
+        }));
+    },
+
+        // Events
+    on_click_add_attachment: function () {
+        console.log("POR LO MENOS VA A ESTA ACCION");
+        this.$('input.o_input_file').click();
+        //this.$input.focus();
+        // set ignoreEscape to avoid escape_pressed event when file selector dialog is opened
+        // when user press escape to cancel file selector dialog then escape_pressed event should not be trigerred
+        this.ignoreEscape = true;
+        console.log("POR LO MENOS Termina.............");
     },
 
     on_click_smiley: function (ev) {

@@ -172,7 +172,7 @@ class ChatWebChannel(models.Model):
         }
 
     @api.model
-    def get_livechat_info(self, channel_id, username='Visitor'):
+    def get_livechat_info(self, channel_id, username='Visitante'):
         info = {}
         info['available'] = len(self.browse(channel_id).get_available_users()) > 0
         info['server_url'] = self.env['ir.config_parameter'].sudo().get_param('web.base.url')

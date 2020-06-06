@@ -32,5 +32,9 @@
     #'demo': [
     #    'demo/demo.xml',
     #],
+
+    'qweb': [
+        'static/src/xml/im_livechat.xml',
+    ],
     'application': True,
 }

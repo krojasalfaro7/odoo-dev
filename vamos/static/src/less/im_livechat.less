@@ -19,6 +19,20 @@
     z-index: 5;
 }
 
+.o_livechat_button_image {
+    position: fixed;
+    bottom: 10%;
+    right: 13%;
+    cursor: pointer;
+}
+
+.o_input_sobre {
+    position:fixed;
+    width:4%;
+    bottom: 1%;
+    right: 1%;
+}
+
 .o_chat_window {
     z-index: 1002; // to go over the navbar
     .o_thread_date_separator {
@@ -76,4 +90,23 @@
             float: right;
         }
     }
+}
+
+
+
+.o_composer_input > textarea {
+    width: 100%;
+    resize: none;
+}
+
+textarea.o_composer_text_field {
+    .o-flex(1, 1, auto);
+}
+
+.o_chatter_composer_tools {
+    .o-flex(0, 0, auto);
+}
+
+.o_composer_button_send, .o_chatter_avatar {
+    display: none;
 }
