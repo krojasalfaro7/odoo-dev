@@ -18,7 +18,7 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['mail', 'website'],
+    'depends': ['base', 'mail', 'web', 'website'],
 
     # always loaded
     'data': [
@@ -35,6 +35,7 @@
 
     'qweb': [
         'static/src/xml/im_livechat.xml',
+        'static/src/xml/chat_window.xml',
     ],
     'application': True,
 }
