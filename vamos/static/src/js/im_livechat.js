@@ -44,17 +44,15 @@ var LivechatButton = Widget.extend({
 
     events: {
         "click": "open_chat",
-        //"click .o_composer_button_add_attachment": "on_click_add_attachment",
-        //"change input.o_input_file": "on_attachment_change",
     },
 
     init: function (parent, server_url, options) {
-        console.log("=================================================init========================================");
-        console.log("_____________________________argumentos pasados a init__________________________________");
-        console.log(parent);
-        console.log(server_url);
-        console.log(options);
-        console.log("_____________________________argumentos pasados a init__________________________________");
+        //console.log("=================================================init========================================");
+        //console.log("_____________________________argumentos pasados a init__________________________________");
+        //console.log(parent);
+        //console.log(server_url);
+        //console.log(options);
+        //console.log("_____________________________argumentos pasados a init__________________________________");
         this._super(parent);
         this.options = _.defaults(options || {}, {
             input_placeholder: _t('Ask something ...'),
@@ -64,7 +62,7 @@ var LivechatButton = Widget.extend({
             isMobile: config.device.isMobile,
             context: {},
         });
-        console.log(this.options);
+        //console.log(this.options);
         this.channel = null;
         this.chat_window = null;
         this.messages = [];
@@ -76,36 +74,18 @@ var LivechatButton = Widget.extend({
         //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
         this.fileupload_id = _.uniqueId('o_chat_fileupload');
         this.set('attachment_ids', this.options.attachment_ids || []);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        console.log("=================================================init========================================");
+        //console.log("=================================================init========================================");
     },
 
     willStart: function () {
-        console.log("==============================================willStart=======================================");
+        //console.log("==============================================willStart=======================================");
         var self = this;
         var cookie = utils.get_cookie('im_livechat_session');
-        console.log("cookie: "+ cookie);
+        //console.log("cookie: "+ cookie);
         var ready;
         if (!cookie) {
-            console.log("Cookie no establecido....");
-            console.log("channel_id: "+this.options.channel_id);
+            //console.log("Cookie no establecido....");
+            //console.log("channel_id: "+this.options.channel_id);
             ready = session.rpc("/im_livechat/init", {channel_id: this.options.channel_id}).then(function (result) {
                 if (!result.available_for_me) {
                     return $.Deferred().reject();
@@ -114,27 +94,26 @@ var LivechatButton = Widget.extend({
             });
         } else {
             var channel = JSON.parse(cookie);
-            console.log(channel);
-            console.log("channel: "+channel.uuid);
+            //console.log(channel);
+            //console.log("channel: "+channel.uuid);
             ready = session.rpc("/mail/chat_history", {uuid: channel.uuid, limit: 100}).then(function (history) {
                 self.history = history;
             });
         }
-        console.log("==============================================willStart=======================================");
+        //console.log("==============================================willStart=======================================");
         return ready.then(this.load_qweb_template.bind(this));
     },
 
     start: function () {
-        console.log("======================================start===================================================");
+        //console.log("======================================start===================================================");
 
         //this.$el.text(this.options.button_text);
         //Editando el $el para que aparezca el icono de sobre en vez de un boton con un texto.
         this.$el.append("<input type='image' src='/vamos/static/src/img/icono_mensaje.png' class='o_input_sobre'></input>");
         var small_screen = config.device.size_class === config.device.SIZES.XS;
         if (this.history) {
-            console.log("Hay historial de mensajes");
-            console.log(this.history);
-            console.log(this.history.reverse());
+            //console.log(this.history);
+            //console.log(this.history.reverse());
             _.each(this.history.reverse(), this.add_message.bind(this));
             this.open_chat();
         } else if (!small_screen && this.rule.action === 'auto_popup') {
@@ -151,22 +130,21 @@ var LivechatButton = Widget.extend({
         });
 
 
-        //Atachements
+        /*//Atachements
         var self = this;
         this.$attachment_button = this.$(".o_composer_button_add_attachment");
         this.$attachments_list = this.$('.o_composer_attachments_list');
         this.render_attachments();
         $(window).on(this.fileupload_id, this.on_attachment_loaded);    
         this.on("change:attachment_ids", this, this.render_attachments);
-        //Atachements
+        //Atachements*/
     
 
-        console.log("======================================start===================================================");
+        //console.log("======================================start===================================================");
         return this._super();
     },
     _on_notification: function(notification){
-        console.log("=================================_on_notification=============================================");
-        console.log(notification);
+        //console.log("=================================_on_notification=============================================");
         if (this.channel && (notification[0] === this.channel.uuid)) {
             if(notification[1]._type === "history_command") { // history request
                 var cookie = utils.get_cookie(LIVECHAT_COOKIE_HISTORY);
@@ -177,7 +155,6 @@ var LivechatButton = Widget.extend({
                     page_history: history,
                 });
             }else{ // normal message
-                console.log(notification[1]);
                 this.add_message(notification[1]);
                 this.render_messages();
                 if (this.chat_window.folded || !this.chat_window.thread.is_at_bottom()) {
@@ -185,10 +162,10 @@ var LivechatButton = Widget.extend({
                 }
             }
         }
-        console.log("=================================_on_notification============================================="); 
+        //console.log("=================================_on_notification============================================="); 
     },
     load_qweb_template: function(){
-        console.log("========================================load_qweb_template======================================");
+        //console.log("========================================load_qweb_template======================================");
         var xml_files = ['/vamos/static/src/xml/chat_window.xml',
                          '/mail/static/src/xml/thread.xml',
                          '/vamos/static/src/xml/im_livechat.xml'];
@@ -197,12 +174,12 @@ var LivechatButton = Widget.extend({
                 QWeb.add_template(xml);
             });
         });
-        console.log("========================================load_qweb_template======================================");
+        //console.log("========================================load_qweb_template======================================");
         return $.when.apply($, defs);
     },
 
     open_chat: _.debounce(function () {
-        console.log("open_chat");
+        //console.log("open_chat");
         if (this.opening_chat) {
             return;
         }
@@ -241,7 +218,7 @@ var LivechatButton = Widget.extend({
     }, 200, true),
 
     open_chat_window: function (channel) {
-        console.log("=========================================open_chat_window===========================");
+        //console.log("=========================================open_chat_window===========================");
         var self = this;
         var options = {
             display_stars: false,
@@ -253,10 +230,6 @@ var LivechatButton = Widget.extend({
             self.chat_window.$el.css({right: 0, bottom: 0});
             self.$el.hide();
         });
-
-        //Incorporando elementos en el template de mail.ChatWindows para añadir funcionalidades de subir archivos
-        //this.chat_window.$(".o_chat_composer").append("<button class='btn btn-sm btn-icon fa fa-paperclip o_composer_button_add_attachment' type='button'/>");
-        //this.chat_window.$(".o_chat_composer").append("<div class='o_chat_composer'>          <div class='o_composer_container'>              <div t-attf-class='o_composer'>                 <div class='o_composer_input'>  <div class='o_chatter_composer_tools'>   <button tabindex='5' class='btn btn-sm btn-icon fa fa-paperclip o_composer_button_add_attachment' type='button'/> <button t-if='widget.options.isMobile' tabindex='3' class='btn btn-sm btn-icon fa fa-paper-plane-o o_composer_button_send' type='button'/>                     </div>                 </div>              </div>              <div class='o_composer_attachments_list'/>          </div>          <div class='o_composer_send'>              <button tabindex='3' class='btn btn-sm btn-primary o_composer_button_send hidden-xs' type='button'><t t-esc='widget.options.send_text'/></button>          </div>          <span class='hide'>      <t t-set='fileupload_id' t-value='widget.fileupload_id'/>     <t t-set='fileupload_action' t-translation='off'>/web/binary/upload_attachment</t>     <t t-set='multi_upload' t-value='true'/>      <div class='o_hidden_input_file' style='fileupload_style'>         <form class='o_form_binary_form' t-att-target='fileupload_id'               method='post' enctype='multipart/form-data' t-att-action='fileupload_action || '/web/binary/upload''>                                  <input type='hidden' name='model' value='mail.compose.message'/>             <input type='hidden' name='id' value='0'/>                                  <input type='hidden' name='csrf_token' t-att-value='csrf_token'/>             <!--<input type='hidden' name='session_id' value='' t-if='widget.getSession().override_session'/>-->             <input type='hidden' name='callback' t-att-value='fileupload_id'/>             <input t-if='widget.image_only' type='file' class='o_input_file' name='ufile' accept='image/*'/>             <input t-if='!widget.image_only' type='file' class='o_input_file' name='ufile' t-att='{'multiple': multi_upload ? 'multiple' : null}'/>             <t t-raw='0'/>         </form>         <iframe t-att-id='fileupload_id' t-att-name='fileupload_id' style='display: none'/>     </div>             </span>     </div> ");
  
         this.chat_window.on("close_chat_session", this, function () {
             var input_disabled = this.chat_window.$(".o_chat_composer input").prop('disabled');
@@ -273,9 +246,7 @@ var LivechatButton = Widget.extend({
         this.chat_window.on("post_message", this, function (message) {
             self.send_message(message).fail(function (error, e) {
                 e.preventDefault();
-                console.log("ATENCIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON");
                 return self.send_message(message); // try again just in case
-                console.log("ATENCIOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOON");
             });
         });
         this.chat_window.on("fold_channel", this, function () {
@@ -289,36 +260,51 @@ var LivechatButton = Widget.extend({
         }, 100));
 
 
+/*
         this.chat_window.on("add_attachment_perro", this, this.on_click_add_attachment);
         this.chat_window.on("attachment_change_perro", this, this.on_attachment_change);
 
+                //Atachements
+        var self = this;
+        this.chat_window.$attachment_button = this.chat_window.$(".o_composer_button_add_attachment");
+        this.chat_window.$attachments_list = this.chat_window.$('.o_composer_attachments_list');
+        this.render_attachments();
+        this.chat_window.$(window).on(this.fileupload_id, this.on_attachment_loaded);    
+        this.chat_window.on("change:attachment_ids", this, this.render_attachments);
+        //Atachements
+    
 
+*/
 
-        console.log("=========================================open_chat_window===========================");
+        //console.log("=========================================open_chat_window===========================");
     },
 
     close_chat: function () {
-        console.log("close_chat");
+        //console.log("close_chat");
         this.chat_window.destroy();
         utils.set_cookie('im_livechat_session', "", -1); // remove cookie
     },
 
     send_message: function (message) {
-        console.log("send_message AQUIIIIIIIIIIIIIIIIIIIIIIIPILAS");
-        console.log(this.get("attachment_ids"));
-        message.attachment_ids = this.get("attachment_ids");
-        console.log(message);
-
         var self = this;
+        console.log("AQUI PRIEMRO")
+        console.log(message.attachment_ids);
+
         return session
-            .rpc("/mail/chat_post", {uuid: this.channel.uuid, message_content: message.content})
+            .rpc("/vamos/chat_post", {uuid: this.channel.uuid, message_content: message.content, attachment_ids: message.attachment_ids})
             .then(function () {
                 self.chat_window.thread.scroll_to();
             });
+
+        /*return session
+            .rpc("/mail/chat_post", {uuid: this.channel.uuid, message_content: message.content})
+            .then(function () {
+                self.chat_window.thread.scroll_to();
+            });*/
     },
 
     add_message: function (data, options) {
-        console.log("=================================add_message================================================");
+        ////console.log("=================================add_message================================================");
         var msg = {
             id: data.id,
             attachment_ids: data.attachment_ids,
@@ -330,7 +316,7 @@ var LivechatButton = Widget.extend({
             is_note: data.is_note,
             customer_email_data: []
         };
-        console.log(msg);
+        ////console.log(msg);
         var hasAlreadyMessage = _.some(this.messages, function (message) {
             return message.id === msg.id;
         });
@@ -353,21 +339,21 @@ var LivechatButton = Widget.extend({
         } else {
             this.messages.push(msg);
         }
-    console.log("=================================add_message================================================");
+    //console.log("=================================add_message================================================");
     },
 
     render_messages: function () {
-        console.log("=====================================render_messages======================================");
+        //console.log("=====================================render_messages======================================");
         var should_scroll = !this.chat_window.folded && this.chat_window.thread.is_at_bottom();
         this.chat_window.render(this.messages);
         if (should_scroll) {
             this.chat_window.thread.scroll_to();
         }
-        console.log("=====================================render_messages======================================");
+        //console.log("=====================================render_messages======================================");
     },
 
     send_welcome_message: function () {
-        console.log("send_welcome_message");
+        //console.log("send_welcome_message");
         if (this.options.default_message) {
             this.add_message({
                 id: '_welcome',
@@ -381,143 +367,12 @@ var LivechatButton = Widget.extend({
         }
     },
 
-
-
-
-
-    //============================================================== Attachments =====================================================
-    on_attachment_change: function(event) {
-        console.log("==========================================on_attachment_change==============================================");
-        var self = this, files = event.target.files, attachments = self.get('attachment_ids');
-        console.log(attachments);
-        console.log(files);
-        console.log(self);
-
-        _.each(files, function(file){
-            var attachment = _.findWhere(attachments, {name: file.name});
-            // if the files already exits, delete the file before upload
-            if(attachment){
-                //self.AttachmentDataSet.unlink([attachment.id]);
-                attachments = _.without(attachments, attachment);
-            }
-        });
-
-        this.$('form.o_form_binary_form').submit();
-        this.$attachment_button.prop('disabled', true);
-        var upload_attachments = _.map(files, function(file){
-            return {
-                'id': 0,
-                'name': file.name,
-                'filename': file.name,
-                'url': '',
-                'upload': true,
-                'mimetype': '',
-            };
-        });
-        attachments = attachments.concat(upload_attachments);
-        this.set('attachment_ids', attachments);
-        console.log(this.get("attachment_ids"));
-        event.target.value = "";
-        alert("SIIIIIIIIIIIIIIIIIIIIIIIII???????????????????????????????????????");
-    console.log("==========================================on_attachment_change==============================================");
-    },
-
-    _onAttachmentDownload: function (event) {
-        event.stopPropagation();
-    },
-
-    on_attachment_loaded: function(event) {
-        console.log("================================on_attachment_loaded====================================");
-        var self = this,
-            attachments = this.get('attachment_ids'),
-            files = Array.prototype.slice.call(arguments, 1);
-            console.log(attachments);
-
-        _.each(files, function(file){
-            if(file.error || !file.id){
-                this.do_warn(file.error);
-                attachments = _.filter(attachments, function (attachment) { return !attachment.upload; });
-            }else{
-                var attachment = _.findWhere(attachments, {filename: file.filename, upload: true});
-                if(attachment){
-                    attachments = _.without(attachments, attachment);
-                    attachments.push({
-                        'id': file.id,
-                        'name': file.name || file.filename,
-                        'filename': file.filename,
-                        'mimetype': file.mimetype,
-                        'url': session.url('/web/content', {'id': file.id, download: true}),
-                    });
-                }
-            }
-        }.bind(this));
-        this.set('attachment_ids', attachments);
-        this.$attachment_button.prop('disabled', false);
-        console.log("================================on_attachment_loaded====================================");
-    },
-    on_attachment_delete: function(event){
-        console.log("on_attachment_delete");
-        event.stopPropagation();
-        var self = this;
-        var attachment_id = $(event.target).data("id");
-        if (attachment_id) {
-            var attachments = [];
-            _.each(this.get('attachment_ids'), function(attachment){
-                if (attachment_id !== attachment.id) {
-                    attachments.push(attachment);
-                } else {
-                    //self.AttachmentDataSet.unlink([attachment_id]);
-                }
-            });
-            this.set('attachment_ids', attachments);
-            this.$('input.o_input_file').val('');
-        }
-    },
-    do_check_attachment_upload: function () {
-        console.log("===============================do_check_attachment_upload==============================================");
-        if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
-            this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
-            return false;
-        }
-        return true;
-        console.log("===============================do_check_attachment_upload==============================================");
-    },
-    render_attachments: function() {
-        console.log("====================render_attachments========================");
-        this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
-            attachments: this.get('attachment_ids'),
-        }));
-        console.log("====================render_attachments========================");
-    },
-
-        // Events
-    on_click_add_attachment: function () {
-        console.log("====================on_click_add_attachment========================");
-        this.chat_window.$('input.o_input_file').click();
-        this.chat_window.$input.focus();
-        // set ignoreEscape to avoid escape_pressed event when file selector dialog is opened
-        // when user press escape to cancel file selector dialog then escape_pressed event should not be trigerred
-        this.chat_window.ignoreEscape = true;
-        console.log("====================on_click_add_attachment========================");
-    },
-//============================================================== Attachments =====================================================
-
-
-
-
-
-
-
-
-
-
-
     ask_feedback: function () {
-        console.log("ask_feedback");
+        //console.log("ask_feedback");
         this.chat_window.$(".o_chat_composer input").prop('disabled', true);
 
         var feedback = new Feedback(this, this.channel.uuid);
-        //feedback.replace(this.chat_window.thread.$el);
+        feedback.replace(this.chat_window.thread.$el);
 
         feedback.on("send_message", this, this.send_message);
         feedback.on("feedback_sent", this, this.close_chat);
@@ -599,11 +454,11 @@ var Feedback = Widget.extend({
 
         // Attachments
     on_attachment_change: function(event) {
-        console.log("==========================================on_attachment_change==============================================");
+        //console.log("==========================================on_attachment_change==============================================");
         var self = this, files = event.target.files, attachments = self.get('attachment_ids');
-        console.log(attachments);
-        console.log(files);
-        console.log(self);
+        //console.log(attachments);
+        //console.log(files);
+        //console.log(self);
 
         _.each(files, function(file){
             var attachment = _.findWhere(attachments, {name: file.name});
@@ -631,9 +486,9 @@ var Feedback = Widget.extend({
         
         this.set('attachment_ids', attachments);
         
-        console.log(this.get("attachment_ids"));
+        //console.log(this.get("attachment_ids"));
         event.target.value = "";
-    console.log("==========================================on_attachment_change==============================================");
+    //console.log("==========================================on_attachment_change==============================================");
     },
 
     _onAttachmentDownload: function (event) {
@@ -641,11 +496,11 @@ var Feedback = Widget.extend({
     },
 
     on_attachment_loaded: function(event) {
-        console.log("================================on_attachment_loaded====================================");
+        //console.log("================================on_attachment_loaded====================================");
         var self = this,
             attachments = this.get('attachment_ids'),
             files = Array.prototype.slice.call(arguments, 1);
-            console.log(attachments);
+            //console.log(attachments);
 
         _.each(files, function(file){
             if(file.error || !file.id){
@@ -667,10 +522,10 @@ var Feedback = Widget.extend({
         }.bind(this));
         this.set('attachment_ids', attachments);
         this.$attachment_button.prop('disabled', false);
-        console.log("================================on_attachment_loaded====================================");
+        //console.log("================================on_attachment_loaded====================================");
     },
     on_attachment_delete: function(event){
-        console.log("on_attachment_delete");
+        //console.log("on_attachment_delete");
         event.stopPropagation();
         var self = this;
         var attachment_id = $(event.target).data("id");
@@ -688,31 +543,31 @@ var Feedback = Widget.extend({
         }
     },
     do_check_attachment_upload: function () {
-        console.log("===============================do_check_attachment_upload==============================================");
+        //console.log("===============================do_check_attachment_upload==============================================");
         if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
             this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
             return false;
         }
         return true;
-        console.log("===============================do_check_attachment_upload==============================================");
+        //console.log("===============================do_check_attachment_upload==============================================");
     },
     render_attachments: function() {
-        console.log("====================render_attachments========================");
+        //console.log("====================render_attachments========================");
         this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
             attachments: this.get('attachment_ids'),
         }));
-        console.log("====================render_attachments========================");
+        //console.log("====================render_attachments========================");
     },
 
         // Events
     on_click_add_attachment: function () {
-        console.log("====================on_click_add_attachment========================");
+        //console.log("====================on_click_add_attachment========================");
         this.$('input.o_input_file').click();
         this.$input.focus();
         // set ignoreEscape to avoid escape_pressed event when file selector dialog is opened
         // when user press escape to cancel file selector dialog then escape_pressed event should not be trigerred
         this.ignoreEscape = true;
-        console.log("====================on_click_add_attachment========================");
+        //console.log("====================on_click_add_attachment========================");
     },
 
     on_click_smiley: function (ev) {
@@ -765,15 +620,6 @@ return {
     LivechatButton: LivechatButton,
     Feedback: Feedback,
 };
-
-
-
-
-
-
-
-
-
 
 
 });

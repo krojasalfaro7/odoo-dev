@@ -25,6 +25,8 @@
 
 
 <!--<script type="text/javascript" src="/web/static/src/js/core/pyeval.js"></script>-->
+
+          <t t-call="web.less_helpers"/>
           <script type="text/javascript" src="/bus/static/src/js/bus.js"></script>
           <script type="text/javascript" src="/mail/static/src/js/document_viewer.js"></script>
           <script type="text/javascript" src="/vamos/static/src/js/chat_window.js"></script>
@@ -32,7 +34,7 @@
 
           
 
-
+        <!--<script type="text/javascript" src="/web/static/src/js/_deprecated/data.js"></script>-->
 
           
           <!--<script type="text/javascript" src="/web/static/src/js/core/context.js"></script>-->

@@ -5,7 +5,16 @@ var ChatThread = require('mail.ChatThread');
 
 var config = require('web.config');
 var core = require('web.core');
+//var data = require('web.data');
 var Widget = require('web.Widget');
+var DocumentViewer = require('mail.DocumentViewer');
+
+
+var DocumentViewer = require('mail.DocumentViewer');
+//var utils = require('mail.utils');
+//var dom = require('web.dom');
+var session = require('web.session');
+
 
 var QWeb = core.qweb;
 var _t = core._t;
@@ -28,10 +37,14 @@ return Widget.extend({
         "click .o_chat_title": "on_click_fold",
 
 
-
-        "click .o_composer_button_add_attachment": "on_click_add_attachment",
         "change input.o_input_file": "on_attachment_change",
+        //"click .o_composer_button_send": "send_message",
+        "click .o_composer_button_add_attachment": "on_click_add_attachment",
 
+        //Falta colocarlos en la vista
+        "click .o_attachment_delete": "on_attachment_delete",
+        "click .o_attachment_download": "_onAttachmentDownload",
+        "click .o_attachment_view": "_onAttachmentView",
 
     },
 
@@ -52,6 +65,15 @@ return Widget.extend({
         this.unread_msgs = unread_msgs || 0;
         this.is_hidden = false;
         this.isMobile = config.device.isMobile;
+
+
+        // Attachments
+        //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
+        this.fileupload_id = _.uniqueId('o_chat_fileupload');
+        //console.log("Valor de this.fileupload_id: ");
+        //console.log(this.fileupload_id);
+        this.set('attachment_ids', options.attachment_ids || []);
+
     },
     start: function () {
         this.$input = this.$('.o_composer_text_field');
@@ -75,7 +97,16 @@ return Widget.extend({
             this.$el.css('margin-right', $.position.scrollbarWidth());
         }
         var def = this.thread.replace(this.$('.o_chat_content'));
+
+        this.$attachment_button = this.$(".o_composer_button_add_attachment");
+        this.$attachments_list = this.$('.o_composer_attachments_list');
+        // Attachments
+        this.render_attachments();
+        //$(window).on(this.fileupload_id, this.on_attachment_loaded);
+        window.addEventListener(this.fileupload_id, this.on_attachment_loaded);
+        this.on("change:attachment_ids", this, this.render_attachments);
         return $.when(this._super(), def);
+
     },
     render: function (messages) {
         this.update_unread(this.unread_msgs);
@@ -143,11 +174,11 @@ return Widget.extend({
             var content = _.str.trim(this.$input.val());
             var message = {
                 content: content,
-                attachment_ids: [],
+                attachment_ids: this.get('attachment_ids'),
                 partner_ids: [],
             };
             this.$input.val('');
-            if (content) {
+            if (content || message.attachment_ids) {
                 this.trigger('post_message', message, this.channel_id);
             }
         }
@@ -201,14 +232,143 @@ return Widget.extend({
     },
 
 
-    on_click_add_attachment: function (event) {
+    /*on_click_add_attachment: function (event) {
         this.trigger("add_attachment_perro");
     },
 
 
     on_attachment_change: function (event) {
         this.trigger("attachment_change_perro", event);
+    },*/
+
+
+    // Attachments
+
+
+
+    on_click_add_attachment: function () {
+        //console.log("====================on_click_add_attachment========================");
+        this.$('input.o_input_file').click();
+        //this.$input.focus();
+        // set ignoreEscape to avoid escape_pressed event when file selector dialog is opened
+        // when user press escape to cancel file selector dialog then escape_pressed event should not be trigerred
+        this.ignoreEscape = true;
+        //console.log("====================on_click_add_attachment========================");
     },
+
+    on_attachment_change: function(event) {
+        //console.log("|______________on_attachment_change___________________|");
+        var self = this,
+            files = event.target.files,
+            attachments = self.get('attachment_ids');
+
+        _.each(files, function(file){
+            var attachment = _.findWhere(attachments, {name: file.name});
+            // if the files already exits, delete the file before upload
+            if(attachment){
+                //self.AttachmentDataSet.unlink([attachment.id]);
+                attachments = _.without(attachments, attachment);
+            }
+        });
+
+        this.$('form.o_form_binary_form').submit();
+        this.$attachment_button.prop('disabled', true);
+        var upload_attachments = _.map(files, function(file){
+            return {
+                'id': 0,
+                'name': file.name,
+                'filename': file.name,
+                'url': '',
+                'upload': true,
+                'mimetype': '',
+            };
+        });
+        attachments = attachments.concat(upload_attachments);
+        this.set('attachment_ids', attachments);
+        //console.log(attachments);
+        event.target.value = "";
+        //console.log("#______________on_attachment_change___________________#");
+    },
+    on_attachment_loaded: function(event) {
+        //console.log("|______________on_attachment_loaded___________________|");
+        //console.log(event.pruebadedatos);
+        var self = this,
+            attachments = this.get('attachment_ids'),
+            files = event.pruebadedatos;
+
+        _.each(files, function(file){
+            if(file.error || !file.id){
+                this.do_warn(file.error);
+                attachments = _.filter(attachments, function (attachment) { return !attachment.upload; });
+            }else{
+                var attachment = _.findWhere(attachments, {filename: file.filename, upload: true});
+                if(attachment){
+                    attachments = _.without(attachments, attachment);
+                    attachments.push({
+                        'id': file.id,
+                        'name': file.name || file.filename,
+                        'filename': file.filename,
+                        'mimetype': file.mimetype,
+                        'url': session.url('/web/content', {'id': file.id, download: true}),
+                    });
+                }
+            }
+        }.bind(this));
+        this.set('attachment_ids', attachments);
+        //console.log(this.get('attachment_ids'));
+        this.$attachment_button.prop('disabled', false);
+        //console.log("#______________on_attachment_loaded___________________#");
+    },
+    on_attachment_delete: function(event){
+        //console.log("|______________on_attachment_delete___________________|");
+        event.stopPropagation();
+        var self = this;
+        var attachment_id = $(event.target).data("id");
+        if (attachment_id) {
+            var attachments = [];
+            _.each(this.get('attachment_ids'), function(attachment){
+                if (attachment_id !== attachment.id) {
+                    attachments.push(attachment);
+                } else {
+                    //self.AttachmentDataSet.unlink([attachment_id]);
+                }
+            });
+            this.set('attachment_ids', attachments);
+            this.$('input.o_input_file').val('');
+        }
+        //console.log("#______________on_attachment_delete___________________#");
+    },
+    do_check_attachment_upload: function () {
+        //console.log("|______________do_check_attachment_upload___________________|");
+        if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
+            this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
+            return false;
+        }
+        return true;
+        //console.log("#______________do_check_attachment_upload___________________#");
+    },
+    render_attachments: function() {
+        //console.log("|______________render_attachments___________________|");
+        this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
+            attachments: this.get('attachment_ids'),
+        }));
+        //console.log("#______________render_attachments___________________#");
+    },
+
+    _onAttachmentView: function (event) {
+    event.stopPropagation();
+    var activeAttachmentID = $(event.currentTarget).data('id');
+    var attachments = this.get('attachment_ids');
+    if (activeAttachmentID) {
+        var attachmentViewer = new DocumentViewer(this, attachments, activeAttachmentID);
+        attachmentViewer.appendTo($('body'));
+    }
+},
+
+    _onAttachmentDownload: function (event) {
+        event.stopPropagation();
+    },
+
 
 });
 

@@ -37,7 +37,7 @@
          <span class="hide">
 
     <t t-set="fileupload_id" t-value="widget.fileupload_id"/>
-    <t t-set="fileupload_action" t-translation="off">/web/binary/upload_attachment</t>
+    <t t-set="fileupload_action" t-translation="off">/vamos/binary/upload_attachment</t>
     <t t-set="multi_upload" t-value="true"/>
 
     <div class="o_hidden_input_file" style="fileupload_style">
