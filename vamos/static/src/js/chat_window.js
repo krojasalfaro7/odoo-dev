@@ -2,19 +2,12 @@ odoo.define('vamos.ChatWindow', function (require) {
 "use strict";
 
 var ChatThread = require('mail.ChatThread');
-
 var config = require('web.config');
 var core = require('web.core');
-//var data = require('web.data');
 var Widget = require('web.Widget');
 var DocumentViewer = require('mail.DocumentViewer');
-
-
 var DocumentViewer = require('mail.DocumentViewer');
-//var utils = require('mail.utils');
-//var dom = require('web.dom');
 var session = require('web.session');
-
 
 var QWeb = core.qweb;
 var _t = core._t;
@@ -36,12 +29,11 @@ return Widget.extend({
         "click .o_chat_window_close": "on_click_close",
         "click .o_chat_title": "on_click_fold",
 
-
+        //Eventos que controlan la subida de archivos
         "change input.o_input_file": "on_attachment_change",
-        //"click .o_composer_button_send": "send_message",
         "click .o_composer_button_add_attachment": "on_click_add_attachment",
 
-        //Falta colocarlos en la vista
+        //Creo que faltan algunos en la vista
         "click .o_attachment_delete": "on_attachment_delete",
         "click .o_attachment_download": "_onAttachmentDownload",
         "click .o_attachment_view": "_onAttachmentView",
@@ -66,12 +58,9 @@ return Widget.extend({
         this.is_hidden = false;
         this.isMobile = config.device.isMobile;
 
-
         // Attachments
         //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
         this.fileupload_id = _.uniqueId('o_chat_fileupload');
-        //console.log("Valor de this.fileupload_id: ");
-        //console.log(this.fileupload_id);
         this.set('attachment_ids', options.attachment_ids || []);
 
     },
@@ -102,7 +91,9 @@ return Widget.extend({
         this.$attachments_list = this.$('.o_composer_attachments_list');
         // Attachments
         this.render_attachments();
-        //$(window).on(this.fileupload_id, this.on_attachment_loaded);
+        //$(window).on(this.fileupload_id, this.on_attachment_loaded); NO FUNCIONO PARA JQUERY, ASI QUE SE IMPLEMENTO PARA JAVASCRIPT
+
+        //Este Listener atrapa el dispath que envia /vamos/binary/upload_attachment
         window.addEventListener(this.fileupload_id, this.on_attachment_loaded);
         this.on("change:attachment_ids", this, this.render_attachments);
         return $.when(this._super(), def);
@@ -110,6 +101,9 @@ return Widget.extend({
     },
     render: function (messages) {
         this.update_unread(this.unread_msgs);
+        //Aver
+        console.log("Verificando el mensaje aqui y ahora");
+        console.log(messages);
         this.thread.render(messages, {display_load_more: false});
     },
     update_unread: function (counter) {
@@ -178,11 +172,19 @@ return Widget.extend({
                 partner_ids: [],
             };
             this.$input.val('');
-            if (content || message.attachment_ids) {
-                this.trigger('post_message', message, this.channel_id);
+
+
+            if (this.is_empty(content) || !this.do_check_attachment_upload()) {
+            return;
             }
+            this.trigger('post_message', message, this.channel_id);
         }
     },
+
+    is_empty: function (content) {
+        return !content && !this.$('.o_attachments').children().length;
+    },
+
     on_click_close: function (event) {
         event.stopPropagation();
         event.preventDefault();
@@ -231,33 +233,20 @@ return Widget.extend({
         }
     },
 
-
-    /*on_click_add_attachment: function (event) {
-        this.trigger("add_attachment_perro");
-    },
-
-
-    on_attachment_change: function (event) {
-        this.trigger("attachment_change_perro", event);
-    },*/
-
-
     // Attachments
 
-
-
     on_click_add_attachment: function () {
-        //console.log("====================on_click_add_attachment========================");
+        console.log("|_________________________________on_click_add_attachment_____________________________________|");
         this.$('input.o_input_file').click();
         //this.$input.focus();
         // set ignoreEscape to avoid escape_pressed event when file selector dialog is opened
         // when user press escape to cancel file selector dialog then escape_pressed event should not be trigerred
         this.ignoreEscape = true;
-        //console.log("====================on_click_add_attachment========================");
+        console.log("#_________________________________on_click_add_attachment_____________________________________#");
     },
 
     on_attachment_change: function(event) {
-        //console.log("|______________on_attachment_change___________________|");
+        console.log("|_________________________________on_attachment_change_____________________________________|");
         var self = this,
             files = event.target.files,
             attachments = self.get('attachment_ids');
@@ -285,13 +274,11 @@ return Widget.extend({
         });
         attachments = attachments.concat(upload_attachments);
         this.set('attachment_ids', attachments);
-        //console.log(attachments);
         event.target.value = "";
-        //console.log("#______________on_attachment_change___________________#");
+        console.log("#_________________________________on_attachment_change_____________________________________#");
     },
     on_attachment_loaded: function(event) {
-        //console.log("|______________on_attachment_loaded___________________|");
-        //console.log(event.pruebadedatos);
+        console.log("|_________________________________on_attachment_loaded_____________________________________|");
         var self = this,
             attachments = this.get('attachment_ids'),
             files = event.pruebadedatos;
@@ -315,12 +302,11 @@ return Widget.extend({
             }
         }.bind(this));
         this.set('attachment_ids', attachments);
-        //console.log(this.get('attachment_ids'));
         this.$attachment_button.prop('disabled', false);
-        //console.log("#______________on_attachment_loaded___________________#");
+        console.log("#_________________________________on_attachment_loaded_____________________________________#");
     },
     on_attachment_delete: function(event){
-        //console.log("|______________on_attachment_delete___________________|");
+        console.log("|_________________________________on_attachment_delete_____________________________________|");
         event.stopPropagation();
         var self = this;
         var attachment_id = $(event.target).data("id");
@@ -336,26 +322,29 @@ return Widget.extend({
             this.set('attachment_ids', attachments);
             this.$('input.o_input_file').val('');
         }
-        //console.log("#______________on_attachment_delete___________________#");
+        console.log("#_________________________________on_attachment_delete_____________________________________#");
     },
     do_check_attachment_upload: function () {
-        //console.log("|______________do_check_attachment_upload___________________|");
+        console.log("|_________________________________do_check_attachment_upload_____________________________________|");
         if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
-            this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
+            alert("Uploading error\nPlease, wait while the file is uploading.");
+            //this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
+            console.log("#_________________________________do_check_attachment_upload_____________________________________#");
             return false;
         }
+        console.log("#_________________________________do_check_attachment_upload_____________________________________#");
         return true;
-        //console.log("#______________do_check_attachment_upload___________________#");
     },
     render_attachments: function() {
-        //console.log("|______________render_attachments___________________|");
+        console.log("|_________________________________render_attachments_____________________________________|");
         this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
             attachments: this.get('attachment_ids'),
         }));
-        //console.log("#______________render_attachments___________________#");
+        console.log("#_________________________________render_attachments_____________________________________#");
     },
 
     _onAttachmentView: function (event) {
+    console.log("|_________________________________render_attachments_____________________________________|");
     event.stopPropagation();
     var activeAttachmentID = $(event.currentTarget).data('id');
     var attachments = this.get('attachment_ids');
@@ -363,13 +352,12 @@ return Widget.extend({
         var attachmentViewer = new DocumentViewer(this, attachments, activeAttachmentID);
         attachmentViewer.appendTo($('body'));
     }
-},
-
-    _onAttachmentDownload: function (event) {
-        event.stopPropagation();
+    console.log("#_________________________________render_attachments_____________________________________#");
     },
-
-
+    _onAttachmentDownload: function (event) {
+        console.log("|__________________________________onAttachmentDownload_____________________________________|");
+        event.stopPropagation();
+        console.log("#__________________________________onAttachmentDownload_____________________________________#");
+    },
 });
-
 });
