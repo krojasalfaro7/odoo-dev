@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<templates xml:space="preserve">
+
+    <t t-name="chat_web.ChatWindow">
+        <div class="o_chat_window o_in_appswitcher">
+
+            <!--Header-->
+            <div class="o_chat_header">
+                <t t-call="mail.ChatWindowHeaderContent">
+                    <t t-set="status" t-value="widget.status"/>
+                    <t t-set="title" t-value="widget.title"/>
+                    <t t-set="unread_counter" t-value="widget.unread_msgs"/>
+                </t>
+            </div>
+
+            <!--Cuerpo-->
+            <div class="o_chat_content">
+            </div>
+
+            <!--Composer-->
+             <div class="o_composer_container">
+                 <div t-attf-class="o_composer">
+                    <div class="o_composer_input">
+
+                        <div t-if='!widget.options.input_less' class="o_chat_composer o_chat_mini_composer">
+                            <input class="o_composer_text_field" t-att-placeholder="widget.options.placeholder" style="width: 88%"/>
+                            <button class="btn btn-sm btn-icon fa fa-paperclip o_composer_button_add_attachment" type="button" style="font-size: 1.3em;"/>
+                            <div class="o_chatter_composer_tools">
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="o_composer_attachments_list"/>
+
+                <span class="hide">
+                  <t t-name="HiddenInputMultipleFiles">
+                    <t t-set="fileupload_id" t-value="widget.fileupload_id"/>
+                        <div t-attf-class="oe_hidden_input_file #{fileupload_class or ''}" t-att-style="fileupload_style">
+                            <form class="o_form_binary_form" t-att-target="fileupload_id"
+                                  method="post" enctype="multipart/form-data" t-att-action="'/chat_web/binary/upload_attachment'">
+
+                                <input type="hidden" name="model" value="mail.compose.message"/>
+                                <input type="hidden" name="id" value="0"/>
+
+                                <input type="hidden" name="csrf_token" t-att-value="csrf_token"/>
+                                <!--<input type="hidden" name="session_id" value="" t-if="widget.session.override_session"/>-->
+
+                                <!--Esta es el evento que se va vincula y envia a on_attachment_loaded, una vez que se el controlador responde-->
+                                <input type="hidden" name="callback" t-att-value="fileupload_id"/>
+                                <t t-raw="0"/>
+                                <input type="file" class="o_input_file" name="ufile" t-if="widget.widget!='image'" multiple="multiple"/>
+                                <input type="file" class="o_input_file" name="ufile" accept="image/*" t-if="widget.widget=='image'"/>
+                            </form>
+                            <iframe t-att-id="fileupload_id" t-att-name="fileupload_id" style="display: none"/>
+                        </div>
+                    </t>
+                </span>
+
+            </div>
+        </div>
+
+    </t>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <t t-name="mail.ChatWindowsDropdown">
+        <div t-attf-class="o_chat_window o_in_appswitcher o_chat_window_dropdown dropup #{open ? 'open' : ''}">
+            <span class="o_chat_window_dropdown_toggler dropdown-toggle" data-toggle="dropdown">
+                <i class="fa fa-comments-o"/> <t t-esc="sessions.length"/>
+                <span class="o_total_unread_counter">
+                    <t t-if="unread_counter"><t t-esc="unread_counter"/></t>
+                </span>
+            </span>
+            <ul class="dropdown-menu">
+                <t t-foreach="sessions" t-as="session">
+                    <li class="o_chat_header" t-att-data-session-id="session.id">
+                        <t t-call="mail.ChatWindowHeaderContent">
+                            <t t-set="status" t-value="session.window.status"/>
+                            <t t-set="title" t-value="session.window.title"/>
+                            <t t-set="unread_counter" t-value="session.window.unread_msgs"/>
+                        </t>
+                    </li>
+                </t>
+            </ul>
+        </div>
+    </t>
+
+    <t t-name="mail.ChatWindowHeaderContent">
+        <span t-if="widget.isMobile">
+            <a href="#" class="o_chat_window_close fa fa-1x fa-arrow-left mr4"/>
+        </span>
+        <span class="o_chat_title">
+            <t t-if="status" t-call="mail.chat.UserStatus"/>
+            <t t-esc="title"/>
+            <span t-if="unread_counter"> (<t t-esc="unread_counter"/>)</span>
+        </span>
+        <span t-if="!widget.isMobile" class="o_chat_window_buttons">
+            <a href="#" class="o_chat_window_close fa fa-close"/>
+        </span>
+    </t>
+
+</templates>

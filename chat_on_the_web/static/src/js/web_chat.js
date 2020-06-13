@@ -1,4 +1,4 @@
-odoo.define('im_livechat.im_livechat', function (require) {
+odoo.define('chat_window.chat_window', function (require) {
 "use strict";
 
 var bus = require('bus.bus').bus;
@@ -8,31 +8,58 @@ var session = require('web.session');
 var time = require('web.time');
 var utils = require('web.utils');
 var Widget = require('web.Widget');
-
-var ChatWindow = require('mail.ChatWindow');
+var ChatWindow = require('ChatWeb.ChatWindow');
 
 var _t = core._t;
 var QWeb = core.qweb;
 
+// Constants
+var LIVECHAT_COOKIE_HISTORY = 'im_livechat_history';
+var HISTORY_LIMIT = 15;
+
+// History tracking
+var page = window.location.href.replace(/^.*\/\/[^\/]+/, '');
+var page_history = utils.get_cookie(LIVECHAT_COOKIE_HISTORY);
+var url_history = [];
+if(page_history){
+    url_history = JSON.parse(page_history) || [];
+}
+if (!_.contains(url_history, page)) {
+    url_history.push(page);
+    while (url_history.length > HISTORY_LIMIT) {
+        url_history.shift();
+    }
+    utils.set_cookie(LIVECHAT_COOKIE_HISTORY, JSON.stringify(url_history), 60*60*24); // 1 day cookie
+}
+
 var LivechatButton = Widget.extend({
-    className:"openerp o_livechat_button hidden-print",
+    //className:"openerp o_livechat_button hidden-print",
+    className:"o_livechat_button_image",
 
     events: {
-        "click": "open_chat"
+        "click": "open_chat",
     },
 
     init: function (parent, server_url, options) {
         this._super(parent);
         this.options = _.defaults(options || {}, {
             input_placeholder: _t('Ask something ...'),
-            default_username: _t("Visitante FUNCIONA????"),
-            button_text: _t("Chat with one of our collaborators FUNCIONAAAAAAAAAAAAAAA"),
-            default_message: _t("QUE PODEMOS HACER PARA QUE FUNCIONE?"),
+            default_username: _t("Visitor"),
+            button_text: _t("Chat with one of our collaborators"),
+            default_message: _t("How may I help you?"),
+            isMobile: config.device.isMobile,
+            context: {},
         });
         this.channel = null;
         this.chat_window = null;
         this.messages = [];
         this.server_url = server_url;
+        this.context = this.options.context;
+
+        // Attachments
+        //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
+        this.fileupload_id = _.uniqueId('o_chat_fileupload');
+        this.set('attachment_ids', this.options.attachment_ids || []);
     },
 
     willStart: function () {
@@ -40,7 +67,7 @@ var LivechatButton = Widget.extend({
         var cookie = utils.get_cookie('im_livechat_session');
         var ready;
         if (!cookie) {
-            ready = session.rpc("/im_livechat/init", {channel_id: this.options.channel_id}).then(function (result) {
+            ready = session.rpc("/chat_web/init", {channel_id: this.options.channel_id}).then(function (result) {
                 if (!result.available_for_me) {
                     return $.Deferred().reject();
                 }
@@ -56,7 +83,10 @@ var LivechatButton = Widget.extend({
     },
 
     start: function () {
-        this.$el.text(this.options.button_text);
+        console.log("|_________________________________start_____________________________________|");
+        //this.$el.text(this.options.button_text);
+        //Editando el $el para que aparezca el icono de sobre en vez de un boton con un texto.
+        this.$el.append("<input type='image' src='/chat_on_the_web/static/src/img/icono_mensaje.png' class='o_input_sobre'></input>");
         var small_screen = config.device.size_class === config.device.SIZES.XS;
         if (this.history) {
             _.each(this.history.reverse(), this.add_message.bind(this));
@@ -70,32 +100,53 @@ var LivechatButton = Widget.extend({
         bus.on('notification', this, function (notifications) {
             var self = this;
             _.each(notifications, function (notification) {
-                if (self.channel && (notification[0] === self.channel.uuid)) {
-                    self.add_message(notification[1]);
-                    self.render_messages();
-                    if (self.chat_window.folded || !self.chat_window.thread.is_at_bottom()) {
-                        self.chat_window.update_unread(self.chat_window.unread_msgs+1);
-                    }
-                }
+                self._on_notification(notification);
             });
         });
+        console.log("#_________________________________start_____________________________________#");
         return this._super();
     },
-
+    _on_notification: function(notification){
+        console.log("|__________________________________on_notification_____________________________________|");
+        if (this.channel && (notification[0] === this.channel.uuid)) {
+            if(notification[1]._type === "history_command") { // history request
+                var cookie = utils.get_cookie(LIVECHAT_COOKIE_HISTORY);
+                var history = cookie ? JSON.parse(cookie) : [];
+                session.rpc("/chat_web/history", {
+                    pid: this.channel.operator_pid[0],
+                    channel_uuid: this.channel.uuid,
+                    page_history: history,
+                });
+            }else{ // normal message
+                //Bucle for para establecer la url de los attachemnt que no lo tenian, aun desconoxzco porque
+                for(var x in notification[1].attachment_ids){
+                    notification[1].attachment_ids[x].url=session.url('/web/content', {'id': notification[1].attachment_ids[x].id, download: true})
+                }
+                this.add_message(notification[1]);
+                this.render_messages();
+                if (this.chat_window.folded || !this.chat_window.thread.is_at_bottom()) {
+                    this.chat_window.update_unread(this.chat_window.unread_msgs+1);
+                }
+            }
+        }
+        console.log("#__________________________________on_notification_____________________________________#");
+    },
     load_qweb_template: function(){
-        var xml_files = ['/mail/static/src/xml/chat_window.xml',
+        console.log("|__________________________________load_qweb_template_____________________________________|");
+        var xml_files = ['/chat_on_the_web/static/src/xml/chat_window.xml',
                          '/mail/static/src/xml/thread.xml',
-                         '/im_livechat/static/src/xml/im_livechat.xml'];
+                         '/chat_on_the_web/static/src/xml/im_livechat.xml'];
         var defs = _.map(xml_files, function (tmpl) {
             return session.rpc('/web/proxy/load', {path: tmpl}).then(function (xml) {
                 QWeb.add_template(xml);
             });
         });
+        console.log("#__________________________________load_qweb_template_____________________________________#");
         return $.when.apply($, defs);
     },
 
-// Al parecer esta es una de las primeras junciones que se ejecutan cuando se inicia el chat
     open_chat: _.debounce(function () {
+        console.log("______________________________________open_chat____________________________________________");
         if (this.opening_chat) {
             return;
         }
@@ -108,7 +159,7 @@ var LivechatButton = Widget.extend({
             def = $.when(JSON.parse(cookie));
         } else {
             this.messages = []; // re-initialize messages cache
-            def = session.rpc('/im_livechat/get_session', {
+            def = session.rpc('/chat_web/get_session', {
                 channel_id : this.options.channel_id,
                 anonymous_name : this.options.default_username,
             }, {shadow: true});
@@ -134,23 +185,19 @@ var LivechatButton = Widget.extend({
     }, 200, true),
 
     open_chat_window: function (channel) {
+        console.log("|__________________________________open_chat_window_____________________________________|");
         var self = this;
         var options = {
             display_stars: false,
-            placeholder: this.options.input_placeholder || "Escribe algo...",
+            placeholder: this.options.input_placeholder || "",
         };
         var is_folded = (channel.state === 'folded');
         this.chat_window = new ChatWindow(this, channel.id, channel.name, is_folded, channel.message_unread_counter, options);
-
         this.chat_window.appendTo($('body')).then(function () {
-            this.chat_window..append("<span>aversilohace</span>")
             self.chat_window.$el.css({right: 0, bottom: 0});
             self.$el.hide();
         });
-
-        
-
-
+ 
         this.chat_window.on("close_chat_session", this, function () {
             var input_disabled = this.chat_window.$(".o_chat_composer input").prop('disabled');
             var ask_fb = !input_disabled && _.find(this.messages, function (msg) {
@@ -158,7 +205,6 @@ var LivechatButton = Widget.extend({
             });
             if (ask_fb) {
                 this.chat_window.toggle_fold(false);
-                this.ask_feedback();
             } else {
                 this.close_chat();
             }
@@ -178,24 +224,31 @@ var LivechatButton = Widget.extend({
                 self.chat_window.update_unread(0);
             }
         }, 100));
+    console.log("#__________________________________open_chat_window_____________________________________#");
     },
 
     close_chat: function () {
+        console.log("|__________________________________close_chat_____________________________________|");
         this.chat_window.destroy();
         utils.set_cookie('im_livechat_session', "", -1); // remove cookie
+        console.log("#__________________________________close_chat_____________________________________#");
     },
 
     send_message: function (message) {
+        console.log("|__________________________________send_message_____________________________________|");
         var self = this;
         return session
-            .rpc("/mail/chat_post", {uuid: this.channel.uuid, message_content: message.content})
+            .rpc("/chat_web/chat_post", {uuid: this.channel.uuid, message_content: message.content, attachment_ids: message.attachment_ids})
             .then(function () {
                 self.chat_window.thread.scroll_to();
+                self.chat_window.set('attachment_ids', []);
+                self.chat_window.render_attachments();
             });
+        console.log("#__________________________________send_message_____________________________________#");
     },
 
     add_message: function (data, options) {
-        alert("ALerta de add_message")
+        console.log("|__________________________________add_message_____________________________________|");
         var msg = {
             id: data.id,
             attachment_ids: data.attachment_ids,
@@ -206,10 +259,14 @@ var LivechatButton = Widget.extend({
             is_note: data.is_note,
             customer_email_data: []
         };
-
+        var hasAlreadyMessage = _.some(this.messages, function (message) {
+            return message.id === msg.id;
+        });
+        if (hasAlreadyMessage) {
+            return;
+        }
         // Compute displayed author name or email
-        msg.displayed_author = msg.author_id && msg.author_id[1] ||
-                               this.options.default_username;
+        msg.displayed_author = msg.author_id && msg.author_id[1] || this.options.default_username;
 
         // Compute the avatar_url
         msg.avatar_src = this.server_url;
@@ -224,19 +281,20 @@ var LivechatButton = Widget.extend({
         } else {
             this.messages.push(msg);
         }
+    console.log("#__________________________________add_message_____________________________________#");
     },
 
     render_messages: function () {
-        alert("ALerta de render_messages")
+        console.log("|__________________________________render_messages_____________________________________|");
         var should_scroll = !this.chat_window.folded && this.chat_window.thread.is_at_bottom();
         this.chat_window.render(this.messages);
         if (should_scroll) {
             this.chat_window.thread.scroll_to();
         }
+        console.log("#__________________________________render_messages_____________________________________#");
     },
 
     send_welcome_message: function () {
-        alert("ALerta de send_welcome_message")
         if (this.options.default_message) {
             this.add_message({
                 id: '_welcome',
@@ -250,88 +308,8 @@ var LivechatButton = Widget.extend({
         }
     },
 
-    ask_feedback: function () {
-        this.chat_window.$(".o_chat_composer input").prop('disabled', true);
-
-        var feedback = new Feedback(this, this.channel.uuid);
-        feedback.replace(this.chat_window.thread.$el);
-
-        feedback.on("send_message", this, this.send_message);
-        feedback.on("feedback_sent", this, this.close_chat);
-    }
 });
-
-/*
- * Rating for Livechat
- *
- * This widget displays the 3 rating smileys, and a textarea to add a reason
- * (only for red smiley), and sends the user feedback to the server.
- */
-var Feedback = Widget.extend({
-    template: "im_livechat.FeedBack",
-
-    events: {
-        'click .o_livechat_rating_choices img': 'on_click_smiley',
-        'click .o_livechat_no_feedback em': 'on_click_no_feedback',
-        'click .o_rating_submit_button': 'on_click_send',
-    },
-
-    init: function (parent, channel_uuid) {
-        this._super(parent);
-        this.channel_uuid = channel_uuid;
-        this.server_origin = session.origin;
-        this.rating = undefined;
-    },
-
-    on_click_smiley: function (ev) {
-        this.rating = parseInt($(ev.currentTarget).data('value'));
-        this.$('.o_livechat_rating_choices img').removeClass('selected');
-        this.$('.o_livechat_rating_choices img[data-value="'+this.rating+'"]').addClass('selected');
-
-        // only display textearea if bad smiley selected
-        var close_chat = false;
-        if (this.rating === 1) {
-            this.$('.o_livechat_rating_reason').show();
-        } else {
-            this.$('.o_livechat_rating_reason').hide();
-            close_chat = true;
-        }
-        this._send_feedback({close: close_chat});
-    },
-
-    on_click_no_feedback: function () {
-        this.trigger("feedback_sent"); // will close the chat
-    },
-
-    on_click_send: function () {
-        if (_.isNumber(this.rating)) {
-            this._send_feedback({ reason: this.$('textarea').val(), close: true });
-        }
-    },
-
-    _send_feedback: function (options) {
-        var self = this;
-        var args = {
-            uuid: this.channel_uuid,
-            rate: this.rating,
-            reason : options.reason
-        };
-        return session.rpc('/im_livechat/feedback', args).then(function () {
-            if (options.close) {
-                var content = _.str.sprintf(_t("Rating: :rating_%d"), self.rating);
-                if (options.reason) {
-                    content += " \n" + options.reason;
-                }
-                self.trigger("send_message", {content: content});
-                self.trigger("feedback_sent"); // will close the chat
-            }
-        });
-    }
-});
-
 return {
     LivechatButton: LivechatButton,
-    Feedback: Feedback,
 };
-
 });

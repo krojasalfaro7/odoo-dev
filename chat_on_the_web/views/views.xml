@@ -1,10 +1,10 @@
 <odoo>
   <data>
     <!-- explicit list view definition -->
-    
-    <record model="ir.ui.view" id="chat_on_the_web.list">
-      <field name="name">chat.web list</field>
-      <field name="model">chat.web</field>
+    <!--
+    <record model="ir.ui.view" id="vamos.list">
+      <field name="name">vamos list</field>
+      <field name="model">vamos.vamos</field>
       <field name="arch" type="xml">
         <tree>
           <field name="name"/>
@@ -13,22 +13,22 @@
         </tree>
       </field>
     </record>
-    
+    -->
 
     <!-- actions opening views on models -->
-  
-    <record model="ir.actions.act_window" id="chat_on_the_web.action_window">
-      <field name="name">chat.web window</field>
-      <field name="res_model">chat.web</field>
+    <!--
+    <record model="ir.actions.act_window" id="vamos.action_window">
+      <field name="name">vamos window</field>
+      <field name="res_model">vamos.vamos</field>
       <field name="view_mode">tree,form</field>
     </record>
-    
+    -->
 
     <!-- server action to the one above -->
-    
-    <!--<record model="ir.actions.server" id="chat_on_the_web.action_server">
-      <field name="name">chat.web server</field>
-      <field name="model_id" ref="model_chat.web_chat.web"/>
+    <!--
+    <record model="ir.actions.server" id="vamos.action_server">
+      <field name="name">vamos server</field>
+      <field name="model_id" ref="model_vamos_vamos"/>
       <field name="state">code</field>
       <field name="code">
         action = {
@@ -37,21 +37,24 @@
           "res_model": self._name,
         }
       </field>
-    </record>-->
-    
+    </record>
+    -->
 
     <!-- Top menu item -->
-    
-    <menuitem name="chat.web" id="chat_on_the_web.menu_root"/>
-    
+    <!--
+    <menuitem name="vamos" id="vamos.menu_root"/>
+    -->
     <!-- menu categories -->
-    
-    <menuitem name="Menu 1" id="chat_on_the_web.menu_1" parent="chat_on_the_web.menu_root"/>
-    <menuitem name="Menu 2" id="chat_on_the_web.menu_2" parent="chat_on_the_web.menu_root"/>
-    
+    <!--
+    <menuitem name="Menu 1" id="vamos.menu_1" parent="vamos.menu_root"/>
+    <menuitem name="Menu 2" id="vamos.menu_2" parent="vamos.menu_root"/>
+    -->
     <!-- actions -->
-    
-    <menuitem name="List" id="chat_on_the_web.menu_1_list" parent="chat_on_the_web.menu_1"
-              action="chat_on_the_web.action_window"/>
+    <!--
+    <menuitem name="List" id="vamos.menu_1_list" parent="vamos.menu_1"
+              action="vamos.action_window"/>
+    <menuitem name="Server to list" id="vamos" parent="vamos.menu_2"
+              action="vamos.action_server"/>
+    -->
   </data>
 </odoo>

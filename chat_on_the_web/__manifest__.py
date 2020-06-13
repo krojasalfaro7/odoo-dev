@@ -2,16 +2,13 @@
 {
     'name': "chat_on_the_web",
 
-    'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
+    'summary': """ Chat en la web""",
 
     'description': """
-        Chat en la pagina web para comunicaciones con los diferentes parthner y los administradores
-    """,
+        Chat Web en Qweb para compartir informacion incluyendo mensajes y archivos con los diferentes pathners y clientes que lleguen a la interfaz web.
+        La opcion de compartir archivos solo esta habilitada en el porceso de pago por transferencia""",
 
-    'author': "Kevin Rojas",
-    #'website': "http://www.yourcompany.com",
+    'author': "edooit / Kevin Rojas",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/11.0/odoo/addons/base/module/module_data.xml
@@ -20,16 +17,18 @@
     'version': '0.1',
 
     # any module necessary for this one to work correctly
-    'depends': ['base', 'mail'],
+    'depends': ['mail', 'website'],
 
     # always loaded
     'data': [
         # 'security/ir.model.access.csv',
-        'views/views.xml',
+        'views/assets.xml',
         'views/templates.xml',
+        'views/website_chat.xml',
+        'data/channel_demo.xml',
     ],
-    # only loaded in demonstration mode
-    #'demo': [
-    #    'demo/demo.xml',
-    #],
+    'qweb': [
+        'static/src/xml/chat_window.xml',
+    ],
+    'application': True,
 }
