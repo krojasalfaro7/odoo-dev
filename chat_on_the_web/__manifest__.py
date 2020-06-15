@@ -26,9 +26,11 @@
         'views/templates.xml',
         'views/website_chat.xml',
         'data/channel_demo.xml',
+        'views/views.xml',
     ],
     'qweb': [
         'static/src/xml/chat_window.xml',
+        'static/src/xml/chat_window_backend.xml',
     ],
     'application': True,
 }

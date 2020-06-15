@@ -166,7 +166,7 @@ var LivechatButton = Widget.extend({
         }
         def.then(function (channel) {
             if (!channel || !channel.operator_pid) {
-                alert(_t("None of our collaborators seems to be available, please try again later."));
+                alert(_t("Parece que ninguno de nuestros colaboradores está disponible. Vuelve a intentarlo más tarde."));
             } else {
                 self.channel = channel;
                 self.open_chat_window(channel);

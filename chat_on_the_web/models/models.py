@@ -32,7 +32,7 @@ class ChatWebChannel(models.Model):
         help="URL to a static page where you client can discuss with the operator of the channel.")
     are_you_inside = fields.Boolean(string='Are you inside the matrix?',
         compute='_are_you_inside', store=False, readonly=True)
-    script_external = fields.Text('Script (external)', compute='_compute_script_external', store=False, readonly=True)
+    #script_external = fields.Text('Script (external)', compute='_compute_script_external', store=False, readonly=True)
     nbr_channel = fields.Integer('Number of conversation', compute='_compute_nbr_channel', store=False, readonly=True)
     """rating_percentage_satisfaction = fields.Integer(
         '% Happy', compute='_compute_percentage_satisfaction', store=False, default=-1,
@@ -58,7 +58,7 @@ class ChatWebChannel(models.Model):
     def _are_you_inside(self):
         self.are_you_inside = bool(self.env.uid in [u.id for u in self.user_ids])
 
-    @api.multi
+    """@api.multi
     def _compute_script_external(self):
         view = self.env['ir.model.data'].get_object('im_livechat', 'external_loader')
         values = {
@@ -67,7 +67,7 @@ class ChatWebChannel(models.Model):
         }
         for record in self:
             values["channel_id"] = record.id
-            record.script_external = view.render(values)
+            record.script_external = view.render(values)"""
 
     @api.multi
     def _compute_web_page_link(self):

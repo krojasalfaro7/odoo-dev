@@ -1,9 +1,11 @@
-odoo.define('im_livechat.chat_client_action', function (require) {
+odoo.define('chat_web.chat_client_action', function (require) {
 "use strict";
 
 require('mail.chat_client_action');
 var chat_manager = require('mail.chat_manager');
 var core = require('web.core');
+
+console.log("tengo que ver si funciona aqui!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
 
 core.action_registry.get('mail.chat.instant_messaging').include({
     _renderSidebar: function (options) {
