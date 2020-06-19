@@ -15,7 +15,7 @@ var HEIGHT_OPEN = '400px';
 var HEIGHT_FOLDED = '34px';
 
 return Widget.extend({
-    template: "chat_web.ChatWindow",
+    template: "chat_on_the_web.ChatWindow",
     custom_events: {
         escape_pressed: '_onEscapePressed',
         document_viewer_closed: '_onDocumentViewerClose',
@@ -325,7 +325,7 @@ return Widget.extend({
         if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
             alert("Uploading error\nPlease, wait while the file is uploading.");
             //this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
-            console.log("#_________________________________do_check_attachment_upload_____________________________________#");
+            ////console.log("#_________________________________do_check_attachment_upload_____________________________________#");
             return false;
         }
         console.log("#_________________________________do_check_attachment_upload_____________________________________#");

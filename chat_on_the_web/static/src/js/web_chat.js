@@ -133,12 +133,13 @@ var LivechatButton = Widget.extend({
     },
     load_qweb_template: function(){
         console.log("|__________________________________load_qweb_template_____________________________________|");
-        var xml_files = ['/chat_on_the_web/static/src/xml/chat_window.xml',
-                         '/mail/static/src/xml/thread.xml',
-                         '/chat_on_the_web/static/src/xml/im_livechat.xml'];
+        var xml_files = ['/mail/static/src/xml/thread.xml',
+                        '/chat_on_the_web/static/src/xml/chat_window.xml'];
         var defs = _.map(xml_files, function (tmpl) {
             return session.rpc('/web/proxy/load', {path: tmpl}).then(function (xml) {
+                console.log("Antes?????????????");
                 QWeb.add_template(xml);
+                console.log("Despues??????????????");
             });
         });
         console.log("#__________________________________load_qweb_template_____________________________________#");

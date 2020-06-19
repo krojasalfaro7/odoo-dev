@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_crypto_payment_crypto_payment,crypto_payment.crypto_payment,model_crypto_payment_crypto_payment,,1,0,0,0

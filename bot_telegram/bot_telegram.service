@@ -1,0 +1,8 @@
+[Unit]
+Description=<em class="replaceable">Bot de telegram automatico</em>
+
+[Service]
+ExecStart=<em>/home/kevinc-debian/Python/bot_telegram</em>
+
+[Install]
+WantedBy=default.target

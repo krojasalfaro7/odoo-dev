@@ -3,13 +3,21 @@
 
     <t t-extend="mail.chat.Sidebar">
         <t t-jquery=".o_mail_chat_sidebar" t-operation="append">
+            <t t-set="channel_title">Clientes</t>
+            <t t-set="channel_icon" t-value="fa-comments"/>
             <t t-set="channel_type" t-value="'livechat'"/>
             <t t-set="disable_add_channel" t-value="true"/>
-            <t t-call="mail.chat.SidebarTitle">
-                <t t-set="channel_title">Chat Web</t>
-                <t t-set="channel_icon" t-value="fa-comments"/>
-            </t>
-            <t t-call="mail.chat.SidebarItems"/>
+
+            <div class="o_mail_sidebar_title">
+                <h4 t-att-class="channel_type == 'public' ? 'o_mail_open_channels' : ''">
+                    <i class="mr4 fa-fw fa fa-comments"></i>
+                    <b><t t-esc="channel_title"/></b>
+                </h4>
+                <span t-if="!disable_add_channel" class="fa fa-plus o_add" title="Add" t-attf-data-type="#{channel_type}"/>
+            </div>
+
+
+            <t t-call="chat_web.chat.SidebarItems"/>
         </t>
     </t>
 
@@ -18,9 +26,34 @@
         <t t-jquery=".o_mail_mobile_tabs" t-operation="append">
             <div class="o_mail_mobile_tab" data-type="livechat">
                 <span class="fa fa-comments"/>
-                <span class="o_tab_title">Chat Web</span>
+                <span class="o_tab_title">Clientes</span>
             </div>
         </t>
     </t>
 
+    <t t-name="chat_web.chat.SidebarItems">
+        <div t-if="!disable_add_channel" class="o_mail_add_channel" t-attf-data-type="#{channel_type}">
+            <!--<span t-if="display_hash">#</span>-->
+            <input type="text" class="o_input" t-attf-placeholder="#{input_placeholder}"/>
+        </div>
+        <t t-foreach="channels" t-as="channel">
+            <t t-set="counter" t-value="channel.is_chat ? channel.unread_counter : channel.needaction_counter"/>
+            <div t-if="channel.type === channel_type" t-att-data-channel-id="channel.id" t-att-title="channel.name"
+                 t-attf-class="o_mail_chat_channel_item #{channel.unread_counter ? ' o_unread_message' : ''} #{(active_channel_id == channel.id) ? 'o_active': ''}">
+                <span class="o_channel_name">
+                    <span t-if="display_status">
+                        <t t-call="mail.chat.UserStatus">
+                            <t t-set="status" t-value="channel.status"/>
+                        </t>
+                    </span>
+                    <!--<span t-if="display_hash" class="o_mail_hash">#</span>-->
+                    <t t-esc="channel.name"/>
+                    <i t-if="channel.mass_mailing" class="fa fa-envelope-o" title="Sends messages by email"/>
+                </span>
+                <t t-call="mail.chat.SidebarNeedaction"/>
+                <span t-if="! channel.group_based_subscription" t-attf-class="fa fa-times o_mail_partner_unpin #{counter ? 'hide' : ''}"
+                      title="Leave this channel" t-att-data-channel-id="channel.id"/>
+            </div>
+        </t>
+    </t>
 </template>

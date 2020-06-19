@@ -14,7 +14,7 @@ class ChatWebChannel(models.Model):
     """
 
     _name = 'chat_web.channel'
-    _description = 'Chat Web Channel'
+    _description = 'ChatWeb Channel'
 
     def _default_user_ids(self):
         return [(6, 0, [self._uid])]
@@ -23,13 +23,13 @@ class ChatWebChannel(models.Model):
     name = fields.Char('Name', required=True, help="The name of the channel")
     button_text = fields.Char('Text of the Button', default='Have a Question? Chat with us.',
         help="Default text displayed on the Livechat Support Button")
-    default_message = fields.Char('Welcome Message', default='How may I help you?',
+    default_message = fields.Char('Mensaje de Bienvenida', default='How may I help you?',
         help="This is an automated 'welcome' message that your visitor will see when they initiate a new conversation.")
-    input_placeholder = fields.Char('Chat Input Placeholder')
+    input_placeholder = fields.Char('Texto de entrada')
 
     # computed fields
-    web_page = fields.Char('Web Page', compute='_compute_web_page_link', store=False, readonly=True,
-        help="URL to a static page where you client can discuss with the operator of the channel.")
+    #web_page = fields.Char('Web Page', compute='_compute_web_page_link', store=False, readonly=True,
+        #help="URL to a static page where you client can discuss with the operator of the channel.")
     are_you_inside = fields.Boolean(string='Are you inside the matrix?',
         compute='_are_you_inside', store=False, readonly=True)
     #script_external = fields.Text('Script (external)', compute='_compute_script_external', store=False, readonly=True)
@@ -59,21 +59,10 @@ class ChatWebChannel(models.Model):
         self.are_you_inside = bool(self.env.uid in [u.id for u in self.user_ids])
 
     """@api.multi
-    def _compute_script_external(self):
-        view = self.env['ir.model.data'].get_object('im_livechat', 'external_loader')
-        values = {
-            "url": self.env['ir.config_parameter'].sudo().get_param('web.base.url'),
-            "dbname": self._cr.dbname,
-        }
-        for record in self:
-            values["channel_id"] = record.id
-            record.script_external = view.render(values)"""
-
-    @api.multi
     def _compute_web_page_link(self):
         base_url = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
         for record in self:
-            record.web_page = "%s/im_livechat/support/%i" % (base_url, record.id)
+            record.web_page = "%s/im_livechat/support/%i" % (base_url, record.id)"""
 
     @api.multi
     @api.depends('channel_ids')
@@ -103,17 +92,6 @@ class ChatWebChannel(models.Model):
     def action_quit(self):
         self.ensure_one()
         return self.write({'user_ids': [(3, self._uid)]})
-
-    @api.multi
-    def action_view_rating(self):
-        """ Action to display the rating relative to the channel, so all rating of the
-            sessions of the current channel
-            :returns : the ir.action 'action_view_rating' with the correct domain
-        """
-        self.ensure_one()
-        action = self.env['ir.actions.act_window'].for_xml_id('im_livechat', 'rating_rating_action_view_livechat_rating')
-        action['domain'] = [('parent_res_id', '=', self.id), ('parent_res_model', '=', 'im_livechat.channel')]
-        return action
 
     # --------------------------
     # Channel Methods
@@ -238,4 +216,20 @@ class ChatWebChannelRule(models.Model):
 class Website(models.Model):
 
     _inherit = "website"
-    channel_id = fields.Many2one('chat_web.channel', string='Website Live Chat Channel')
+    channel_id = fields.Many2one('chat_web.channel', string='WebChat Channel')
+
+class ResConfigSettings(models.TransientModel):
+
+    _inherit = 'res.config.settings'
+    channel_id = fields.Many2one('chat_web.channel', string='WebChat Channel', related='website_id.channel_id')
+    has_chat_web = fields.Boolean(string='Web Chat')
+
+    def get_has_chat_web(self):
+        return self.has_chat_web
+
+    """@api.onchange('has_chat_web')
+    def onchange_has_chat_web(self):
+        if not self.has_chat_web:
+            self.has_chat_web = False
+        else:
+            self.has_chat_web = True"""

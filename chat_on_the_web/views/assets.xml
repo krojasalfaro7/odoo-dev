@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 <data>
-
-  <!--Integrate Livechat Conversation in the Mail Chat Client Action-->
+  <!--Recursos necesarios para que se vean los chats en el modulo de debates-->
   <template id="assets_backend" name="ChatWeb assets backend" inherit_id="web.assets_backend">
       <xpath expr="." position="inside">
           <script type="text/javascript" src="/chat_on_the_web/static/src/js/web_chat_backend.js"></script>
@@ -11,6 +10,7 @@
       </xpath>
   </template>
 
+  <!--Recursos necesarios para establecer los diferentes chats en la interfaz web-->
   <template id="assets_frontend" name="ChatWeb assets frontend" inherit_id="website.assets_frontend">
       <xpath expr="." position="inside">
           <t t-call="web.less_helpers"/>
@@ -24,10 +24,5 @@
           <link rel="stylesheet" href="/chat_on_the_web/static/src/less/web_chat.less"/>
       </xpath>
   </template>
-    <!--<template id="assets_backend" name="ChatWeb assets backend" inherit_id="web.assets_backend">
-        <xpath expr="." position="inside">
-            <script type="text/javascript" src="/chat_on_the_web/static/src/js/im_livechat_backend.js"></script>
-        </xpath>
-    </template>-->
 </data>
 </odoo>

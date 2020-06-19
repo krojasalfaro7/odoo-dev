@@ -5,8 +5,8 @@
     'summary': """ Chat en la web""",
 
     'description': """
-        Chat Web en Qweb para compartir informacion incluyendo mensajes y archivos con los diferentes pathners y clientes que lleguen a la interfaz web.
-        La opcion de compartir archivos solo esta habilitada en el porceso de pago por transferencia""",
+        Chat Web en Qweb para compartir información incluyendo mensajes y archivos con los diferentes pathners y clientes que lleguen a la interfaz web.
+        La opción de compartir archivos solo está habilitada en el proceso de pago por transferencia""",
 
     'author': "edooit / Kevin Rojas",
 
@@ -21,12 +21,13 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
+        'security/ir.model.access.csv',
         'views/assets.xml',
         'views/templates.xml',
         'views/website_chat.xml',
-        'data/channel_demo.xml',
+        'views/res_config.xml',
         'views/views.xml',
+        'data/channel_demo.xml',
     ],
     'qweb': [
         'static/src/xml/chat_window.xml',

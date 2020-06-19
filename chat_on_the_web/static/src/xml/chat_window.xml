@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <templates xml:space="preserve">
 
-    <t t-name="chat_web.ChatWindow">
+    <t t-name="chat_on_the_web.ChatWindow">
         <div class="o_chat_window o_in_appswitcher">
-
-            <!--Header-->
             <div class="o_chat_header">
                 <t t-call="mail.ChatWindowHeaderContent">
                     <t t-set="status" t-value="widget.status"/>
@@ -12,12 +10,8 @@
                     <t t-set="unread_counter" t-value="widget.unread_msgs"/>
                 </t>
             </div>
-
-            <!--Cuerpo-->
             <div class="o_chat_content">
             </div>
-
-            <!--Composer-->
              <div class="o_composer_container">
                  <div t-attf-class="o_composer">
                     <div class="o_composer_input">
@@ -62,64 +56,6 @@
         </div>
 
     </t>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
     <t t-name="mail.ChatWindowsDropdown">
         <div t-attf-class="o_chat_window o_in_appswitcher o_chat_window_dropdown dropup #{open ? 'open' : ''}">

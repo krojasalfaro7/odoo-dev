@@ -4,7 +4,8 @@
     <template id="cargar" name="ChatWeb : Agregando la funcionalidad del boton">
         <t t-if="not info">
             <t t-set="info" t-value="request.env['chat_web.channel'].get_livechat_info(channel)"/>
-        </t>
+        </t>           
+
             document.addEventListener("DOMContentLoaded", function(event) {
             console.log("ok");
                 <t t-if="web_session_required">

@@ -2,7 +2,7 @@
 <odoo>
      <data>
          <record id="chat_web_channel_data_website" model="chat_web.channel">
-             <field name="name">CanalDePrueba</field>
+             <field name="name">Clientes</field>
              <field name="default_message">¿Como podemos ayudarte?</field>
              <field name="button_text">¿Tienes una pregunta? Chatea</field>
              <field name="input_placeholder">Escribe algo...</field>

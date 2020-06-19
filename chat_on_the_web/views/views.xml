@@ -68,7 +68,7 @@
             <field name="context">{}</field>
             <field name="help" type="html">
                 <p>
-                    Your chatter history is empty. Create a channel and start chatting to fill up your history.
+                    Tu historial de conversaciones está vacío.
                 </p>
             </field>
         </record>
@@ -137,7 +137,7 @@
                 <kanban>
                     <field name="id"/>
                     <field name="name"/>
-                    <field name="web_page" widget="url"/>
+                    <!--<field name="web_page" widget="url"/>-->
                     <field name="are_you_inside"/>
                     <field name="user_ids"/>
                     <field name="nbr_channel"/>
@@ -145,22 +145,22 @@
                         <t t-name="kanban-box">
                             <div class="oe_kanban_global_click">
                                 <div class="o_kanban_image">
-                                    <img t-att-src="kanban_image('im_livechat.channel', 'image_medium', record.id.raw_value)" class="img-responsive"/>
+                                    <img t-att-src="kanban_image('chat_web.channel', 'image_medium', record.id.raw_value)" class="img-responsive"/>
                                 </div>
                                 <div class="oe_kanban_details">
                                     <strong class="o_kanban_record_title"><field name="name"/></strong>
                                     <div>
                                         <p>
                                             <i class="fa fa-user"></i>
-                                            <t t-esc="(record.user_ids.raw_value || []).length"/> Operators
+                                            <t t-esc="(record.user_ids.raw_value || []).length"/> Operadores
                                             <br/>
                                             <i class="fa fa-comments"></i>
-                                            <t t-esc="record.nbr_channel.raw_value"/> Sessions
+                                            <t t-esc="record.nbr_channel.raw_value"/> Sesiones
                                         </p>
                                     </div>
                                     <div class="o_kanban_button">
-                                        <button t-if="record.are_you_inside.raw_value" name="action_quit" type="object" class="btn btn-sm btn-primary">Ausencia</button>
-                                        <button t-if="!record.are_you_inside.raw_value" name="action_join" type="object" class="btn btn-sm btn-primary">Join</button>
+                                        <button t-if="record.are_you_inside.raw_value" name="action_quit" type="object" class="btn btn-sm btn-primary">Dejar</button>
+                                        <button t-if="!record.are_you_inside.raw_value" name="action_join" type="object" class="btn btn-sm btn-primary">Unirse</button>
                                     </div>
                                 </div>
                             </div>
@@ -187,13 +187,13 @@
                             <field name="name" placeholder="e.g. YourWebsite.com"/>
                         </h1>
                         <div>
-                            <button type="object" name="action_join" class="oe_highlight" string="Join Channel" attrs='{"invisible": [["are_you_inside", "=", True]]}'/>
-                            <button type="object" name="action_quit" string="Leave Channel" attrs='{"invisible": [["are_you_inside", "=", False]]}'/>
+                            <button type="object" name="action_join" class="oe_highlight" string="Unirse al Canal" attrs='{"invisible": [["are_you_inside", "=", True]]}'/>
+                            <button type="object" name="action_quit" string="Dejar Canal" attrs='{"invisible": [["are_you_inside", "=", False]]}'/>
                             <field name="are_you_inside" invisible="1"/>
                         </div>
                     </div>
                     <group>
-                        <group string="Operators">
+                        <group string="Operadores">
                             <field name="user_ids" nolabel="1" colspan="2">
                                 <kanban>
                                     <field name="id"/>
@@ -214,11 +214,11 @@
                                 </kanban>
                             </field>
                             <p class="text-muted">
-                                Operators that do not show any activity In Odoo for more than 30 minutes will be considered as disconnected.
+                                Los operadores que no muestran ninguna actividad en Odoo durante más de 30 minutos se considerarán desconectados.
                             </p>
                         </group>
-                        <group string="Options">
-                            <field name="button_text"/>
+                        <group string="Opciones">
+                            <!--<field name="button_text"/>-->
                             <field name="input_placeholder"/>
                             <field name="default_message" placeholder="e.g. Hello, how may I help you?"/>
                         </group>
@@ -237,10 +237,10 @@
                         <p>For website built with Odoo CMS, please install the website_livechat module. Then go to Website Admin > Configuration > Settings and select the Website Live Chat Channel you want to add on your website.</p>
                     </div>-->
 
-                    <group string="Channel Rules">
+                   <!--<group string="Channel Rules">
                         <field name="rule_ids" nolabel="1"/>
-                    </group>
-                    <span>Define rules for your live support channel. You can apply an action (disable the support, automatically open your support, or just make the button available) for the given URL, and per country.<br />To identify the country, GeoIP must be installed on your server, otherwise, the countries of the rule will not be taken into account.</span>
+                    </group>-->
+                    <!--<span>Define rules for your live support channel. You can apply an action (disable the support, automatically open your support, or just make the button available) for the given URL, and per country.<br />To identify the country, GeoIP must be installed on your server, otherwise, the countries of the rule will not be taken into account.</span>-->
                 </sheet>
                 </form>
             </field>
@@ -248,8 +248,7 @@
 
 
 
-        <!-- im_livechat.channel.rule -->
-        <record id="im_livechat_channel_rule_view_tree" model="ir.ui.view">
+        <!--<record id="im_livechat_channel_rule_view_tree" model="ir.ui.view">
             <field name="name">chat.web.channel.rule.tree</field>
             <field name="model">chat_web.channel.rule</field>
             <field name="arch" type="xml">
@@ -281,7 +280,7 @@
                     </sheet>
                 </form>
             </field>
-        </record>
+        </record>-->
 
         <!-- Canned responses -->
         <record id="chat_web_canned_response_view_tree" model="ir.ui.view">
