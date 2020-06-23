@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "crypto_payment",
+    'name': "payment_glufco",
 
-    'summary': """Payment Acquirer: Glufco Implementation""",
+    'summary': """Payment Acquirer: Glufco Payment Acquirer""",
 
     'description': """
-        Método de pago por glufco
+        Glufco Payment Acquirer
     """,
 
     'author': "edooit / Kevin Rojas",
@@ -24,6 +24,8 @@
         # 'security/ir.model.access.csv',
         'views/views.xml',
         'views/templates.xml',
+        'data/payment_icon_data.xml',
         'data/payment_acquirer_data.xml',
     ],
+    'application': True,
 }

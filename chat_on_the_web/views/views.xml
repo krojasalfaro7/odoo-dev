@@ -1,9 +1,5 @@
 <odoo>
   <data>
-
-
-
-
  <record id="mail_channel_view_search" model="ir.ui.view">
             <field name="name">mail.channel.search</field>
             <field name="model">mail.channel</field>
@@ -313,7 +309,7 @@
         </record>
 
         <!-- Menu items -->
-        <menuitem
+        <!--<menuitem
             id="menu_livechat_root"
             name="Chat Web"
             web_icon="chat_web,static/description/icono_mensaje.png"
@@ -338,20 +334,37 @@
             name="Historial de sesiones"
             parent="menu_reporting_livechat"
             action="mail_channel_action"
+            sequence="1"/>-->
+
+
+
+
+
+
+        <menuitem id="menu_livechat_root" parent="website.menu_website_configuration" name="Chat Web" sequence="205"/>
+
+        <menuitem name="Canales"
+            id="support_channels"
+            action="chat_web_channel_action"
+            parent="menu_livechat_root"
+            sequence="5"/>
+
+
+        <menuitem name="Informe"
+            id="menu_reporting_livechat"
+            parent="menu_livechat_root"
+            sequence="50"/>
+
+
+        <menuitem name="Historial de sesiones"
+            id="session_history"
+            action="mail_channel_action"
+            parent="menu_reporting_livechat"
             sequence="1"/>
 
-       <!-- <menuitem
-            id="livechat_config"
-            name="Configuration"
-            parent="menu_livechat_root"
-            sequence="55"/>
 
-        <menuitem
-            id="canned_responses"
-            name="Canned Responses"
-            parent="livechat_config"
-            action="chat_web_canned_response_action"
-            sequence="15"/>-->
+
+
 
   </data>
 </odoo>

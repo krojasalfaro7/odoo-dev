@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+
+    <record id="payment_acquirer_glufco" model="payment.acquirer">
+        <field name="name">Glufco</field>
+        <field name="sequence">1</field>
+        <field name="view_template_id" ref="payment.default_acquirer_button"/>
+        <field name="image" type="base64" file="payment_glufco/static/src/img/logo_glufco.png"/>
+        <field name="module_id" ref="base.module_payment_glufco"/>
+        <field name="description" type="html">
+            <p>
+                Glufco Investment CryptoBank.
+            </p>
+            <ul class="list-inline">
+                <li><i class="fa fa-check"/>Online Payment</li>
+                <li><i class="fa fa-check"/>Payment Status Tracking</li>
+            </ul>
+        </field>
+
+        <field name="payment_icon_ids" eval='[(6, 0, [ref("payment.payment_icon_bitcoin"),
+                                                        ref("payment.payment_icon_dash"),
+                                                        ref("payment.payment_icon_litecoin")
+                                                        )])]'/>
+    </record>
+
+        <record id="payment_glufco.payment_acquirer_glufco" model="payment.acquirer">
+            <field name="name">Glufco</field>
+            <field name="image" type="base64" file="payment_glufco/static/src/img/logo_glufco.png"/>
+            <field name="provider">glufco</field>
+            <field name="company_id" ref="base.main_company"/>
+            <field name="view_template_id" ref="paypal_form"/>
+            <!--<field name="environment">test</field>-->
+            <field name="pre_msg"><![CDATA[
+<p>You will be redirected to the Paypal website after clicking on the payment button.</p>]]></field>
+            <field name="paypal_email_account">dummy</field>
+            <field name="paypal_seller_account">dummy</field>
+            <field name="paypal_api_username">dummy</field>
+            <field name="paypal_api_password">dummy</field>
+            <field name="paypal_pdt_token">dummy</field>
+        </record>
+
+
+
+
+
+  
+
+
+
+
+
+    </data>
+</odoo>

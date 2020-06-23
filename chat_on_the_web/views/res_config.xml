@@ -9,11 +9,10 @@
             <div id="languages_setting" position="after">
                 <div class="col-xs-12 col-md-6 o_setting_box" id="live_chat_install_setting">
                     <div class="o_setting_left_pane" modifiers="{}">
-                        <field name="has_chat_web" on_change="1" modifiers="{}"/>
+                        <field name="has_chat_web" modifiers="{}"/>
                     </div>
-                    
                     <div class="o_setting_right_pane">
-                        <label string="Chat Web"/>
+                        <label for="has_chat_web" modifiers="{}"/>
                         <div class="text-muted">
                             Canal Chat Web en el sitio Web
                         </div>
@@ -25,6 +24,22 @@
                         </div>
                     </div>
                 </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             </div>
         </field>
     </record>

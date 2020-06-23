@@ -107,3 +107,8 @@ class ChatWeb(http.Controller):
                     'id': attachment.id
                 })
         return out % (json.dumps(callback), json.dumps(args))
+
+    @http.route('/chat_web/getEnableChat', type="json", auth="public")
+    def getEnableChat(self):
+        is_enable_chat = request.env['ir.config_parameter'].sudo().get_param('website.has_chat_web')
+        return is_enable_chat

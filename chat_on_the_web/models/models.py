@@ -222,10 +222,24 @@ class ResConfigSettings(models.TransientModel):
 
     _inherit = 'res.config.settings'
     channel_id = fields.Many2one('chat_web.channel', string='WebChat Channel', related='website_id.channel_id')
-    has_chat_web = fields.Boolean(string='Web Chat')
+    has_chat_web = fields.Boolean(string='Chat Web')
 
     def get_has_chat_web(self):
         return self.has_chat_web
+
+
+    @api.model
+    def get_values(self):
+        res = super(ResConfigSettings, self).get_values()
+        get_param = self.env['ir.config_parameter'].sudo().get_param
+        res.update(has_chat_web=get_param('website.has_chat_web'))
+        return res
+
+    def set_values(self):
+        res = super(ResConfigSettings, self).set_values()
+        set_param = self.env['ir.config_parameter'].sudo().set_param
+        set_param('website.has_chat_web', self.has_chat_web)
+        return res
 
     """@api.onchange('has_chat_web')
     def onchange_has_chat_web(self):
