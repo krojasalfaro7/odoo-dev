@@ -10,6 +10,11 @@
         <field name="image" type="base64" file="payment_glufco/static/src/img/icono_dash.png"/>
     </record>
 
+    <record id="payment_icon_glufco" model="payment.icon">
+        <field name="name">Glufco</field>
+        <field name="image" type="base64" file="payment_glufco/static/src/img/icono_glufco.png"/>
+    </record>
+
     <record id="payment_icon_litecoin" model="payment.icon">
         <field name="name">Litecoin</field>
         <field name="image" type="base64" file="payment_glufco/static/src/img/icono_litecoin.png"/>

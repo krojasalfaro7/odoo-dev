@@ -188,7 +188,7 @@
                             <field name="are_you_inside" invisible="1"/>
                         </div>
                     </div>
-                    <group>
+                    <!--<group>-->
                         <group string="Operadores">
                             <field name="user_ids" nolabel="1" colspan="2">
                                 <kanban>
@@ -216,9 +216,10 @@
                         <group string="Opciones">
                             <!--<field name="button_text"/>-->
                             <field name="input_placeholder"/>
-                            <field name="default_message" placeholder="e.g. Hello, how may I help you?"/>
+                            <field name="default_message" placeholder="e.g. Hola, cómo puedo ayudarte?"/>
+                            <field name="no_operator_online"/>
                         </group>
-                    </group>
+                    <!--</group>-->
 
                     <!--<div attrs='{"invisible": [["web_page", "=", False]]}'>
                         <separator string="How to use the Website Live Chat widget?"/>

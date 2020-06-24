@@ -2,7 +2,7 @@
 {
     'name': "payment_glufco",
 
-    'summary': """Payment Acquirer: Glufco Payment Acquirer""",
+    'summary': """Glufco Payment Acquirer""",
 
     'description': """
         Glufco Payment Acquirer

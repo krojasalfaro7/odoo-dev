@@ -4,10 +4,16 @@
     <template id="cargar" name="ChatWeb : Agregando la funcionalidad del boton">
         <t t-if="not info">
             <t t-set="info" t-value="request.env['chat_web.channel'].get_livechat_info(channel)"/>
-        </t>           
+        </t>
+
+        <t t-if="not (order == None)">
+            <t t-if="not (order.payment_acquirer_id == None)">          
+                <t t-if="not (order.payment_acquirer_id.provider == None)" t-set="is_transfer" t-value="order.payment_acquirer_id.provider == 'transfer'"/>
+            </t>
+        </t>
+
 
             document.addEventListener("DOMContentLoaded", function(event) {
-            console.log("ok");
                 <t t-if="web_session_required">
                 odoo.define('web.session', function (require) {
                     var Session = require('web.Session');
@@ -18,12 +24,14 @@
                 
                 odoo.define('chat_web.support', function (require) {
                     <t t-if="info['available']" t-translation="off">
-                        console.log("info['available está habilitado']");
                         var chat_web = require('chat_window.chat_window');
                         var button = new chat_web.LivechatButton(
                             $('body'),
                             "<t t-esc="info['server_url']"/>",
-                            <t t-raw="json.dumps(info.get('options', {}))"/>
+                            <t t-raw="json.dumps(info.get('options', {}))"/>,
+                            <t t-if="is_transfer">
+                                "<t t-esc="is_transfer"/>"
+                            </t>
                         );
                         button.appendTo($('body'));
                         window.livechat_button = button;

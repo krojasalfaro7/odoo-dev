@@ -14,7 +14,8 @@ class ChatWeb(http.Controller):
     @http.route('/chat_web/init', type='json', auth="public")
     def chat_web_init(self, channel_id):
         LivechatChannel = request.env['chat_web.channel']
-        available = len(LivechatChannel.browse(channel_id).get_available_users())
+        #available = len(LivechatChannel.browse(channel_id).get_available_users())
+        available = True
         rule = {}
         if available:
             # find the country from the request

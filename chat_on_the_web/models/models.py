@@ -26,6 +26,7 @@ class ChatWebChannel(models.Model):
     default_message = fields.Char('Mensaje de Bienvenida', default='How may I help you?',
         help="This is an automated 'welcome' message that your visitor will see when they initiate a new conversation.")
     input_placeholder = fields.Char('Texto de entrada')
+    no_operator_online = fields.Char('Mensaje cuando no hay operadores en linea', default="Parece que ninguno de nuestros colaboradores está disponible. Vuelve a intentarlo más tarde.")
 
     # computed fields
     #web_page = fields.Char('Web Page', compute='_compute_web_page_link', store=False, readonly=True,
@@ -147,16 +148,18 @@ class ChatWebChannel(models.Model):
             'default_message': channel.default_message,
             "channel_name": channel.name,
             "channel_id": channel.id,
+            "no_operator_online" : channel.no_operator_online,
         }
 
     @api.model
     def get_livechat_info(self, channel_id, username='Visitante'):
         info = {}
-        info['available'] = len(self.browse(channel_id).get_available_users()) > 0
+        #info['available'] = len(self.browse(channel_id).get_available_users()) > 0
         info['server_url'] = self.env['ir.config_parameter'].sudo().get_param('web.base.url')
-        if info['available']:
-            info['options'] = self.sudo().get_channel_infos(channel_id)
-            info['options']["default_username"] = username
+        info['available'] = True
+        #if info['available']:
+        info['options'] = self.sudo().get_channel_infos(channel_id)
+        info['options']["default_username"] = username
         return info
 
 

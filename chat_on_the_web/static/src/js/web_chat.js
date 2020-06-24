@@ -40,15 +40,18 @@ var LivechatButton = Widget.extend({
         "click": "open_chat",
     },
 
-    init: function (parent, server_url, options) {
+    init: function (parent, server_url, options, is_transfer) {
+        //console.log("|_________________________________init_____________________________________|");
         this._super(parent);
+        this.is_transfer = is_transfer == "True" ? true : false;
         this.options = _.defaults(options || {}, {
-            input_placeholder: _t('Ask something ...'),
-            default_username: _t("Visitor"),
-            button_text: _t("Chat with one of our collaborators"),
-            default_message: _t("How may I help you?"),
+            input_placeholder: _t('Pregunta algo ...'),
+            default_username: _t("Visitante"),
+            button_text: _t("Chatea con algunos de nuestros colaboradores"),
+            default_message: _t("Cómo podemos ayudarte?"),
             isMobile: config.device.isMobile,
             context: {},
+            no_operator_online: _t("Parece que ninguno de nuestros colaboradores está disponible. Vuelve a intentarlo más tarde."),
         });
         this.channel = null;
         this.chat_window = null;
@@ -60,9 +63,12 @@ var LivechatButton = Widget.extend({
         //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
         this.fileupload_id = _.uniqueId('o_chat_fileupload');
         this.set('attachment_ids', this.options.attachment_ids || []);
+        //console.log(this.options);
+        //console.log("#_________________________________init_____________________________________#");
     },
 
     willStart: function () {
+        //console.log("|_________________________________willStart_____________________________________|");
         var self = this;
         var cookie = utils.get_cookie('im_livechat_session');
         var ready;
@@ -79,11 +85,13 @@ var LivechatButton = Widget.extend({
                 self.history = history;
             });
         }
+        //console.log("#_________________________________willStart_____________________________________#");
         return ready.then(this.load_qweb_template.bind(this));
     },
 
     start: function () {
-        console.log("|_________________________________start_____________________________________|");
+        //console.log("|_________________________________start_____________________________________|");
+        //console.log(Math.round(Math.random()*(900-1)+1));
         //this.$el.text(this.options.button_text);
         //Editando el $el para que aparezca el icono de sobre en vez de un boton con un texto.
         this.$el.append("<input type='image' src='/chat_on_the_web/static/src/img/icono_mensaje.png' class='o_input_sobre'></input>");
@@ -103,11 +111,11 @@ var LivechatButton = Widget.extend({
                 self._on_notification(notification);
             });
         });
-        console.log("#_________________________________start_____________________________________#");
+        //console.log("#_________________________________start_____________________________________#");
         return this._super();
     },
     _on_notification: function(notification){
-        console.log("|__________________________________on_notification_____________________________________|");
+        //console.log("|__________________________________on_notification_____________________________________|");
         if (this.channel && (notification[0] === this.channel.uuid)) {
             if(notification[1]._type === "history_command") { // history request
                 var cookie = utils.get_cookie(LIVECHAT_COOKIE_HISTORY);
@@ -129,28 +137,27 @@ var LivechatButton = Widget.extend({
                 }
             }
         }
-        console.log("#__________________________________on_notification_____________________________________#");
+        //console.log("#__________________________________on_notification_____________________________________#");
     },
     load_qweb_template: function(){
-        console.log("|__________________________________load_qweb_template_____________________________________|");
+        //console.log("|__________________________________load_qweb_template_____________________________________|");
         var xml_files = ['/mail/static/src/xml/thread.xml',
                         '/chat_on_the_web/static/src/xml/chat_window.xml'];
         var defs = _.map(xml_files, function (tmpl) {
             return session.rpc('/web/proxy/load', {path: tmpl}).then(function (xml) {
-                console.log("Antes?????????????");
                 QWeb.add_template(xml);
-                console.log("Despues??????????????");
             });
         });
-        console.log("#__________________________________load_qweb_template_____________________________________#");
+        //console.log("#__________________________________load_qweb_template_____________________________________#");
         return $.when.apply($, defs);
     },
 
     open_chat: _.debounce(function () {
-        console.log("______________________________________open_chat____________________________________________");
+        //console.log("______________________________________open_chat____________________________________________");
         if (this.opening_chat) {
             return;
         }
+        var operators_online = this.options.no_operator_online; // Mensaje personalizado para cuando no hay operadores en linea
         var self = this;
         var cookie = utils.get_cookie('im_livechat_session');
         var def;
@@ -167,7 +174,8 @@ var LivechatButton = Widget.extend({
         }
         def.then(function (channel) {
             if (!channel || !channel.operator_pid) {
-                alert(_t("Parece que ninguno de nuestros colaboradores está disponible. Vuelve a intentarlo más tarde."));
+                //alert(_t("Parece que ninguno de nuestros colaboradores está disponible. Vuelve a intentarlo más tarde."));
+                alert(_t(operators_online));
             } else {
                 self.channel = channel;
                 self.open_chat_window(channel);
@@ -186,21 +194,21 @@ var LivechatButton = Widget.extend({
     }, 200, true),
 
     open_chat_window: function (channel) {
-        console.log("|__________________________________open_chat_window_____________________________________|");
+        //console.log("|__________________________________open_chat_window_____________________________________|");
         var self = this;
         var options = {
             display_stars: false,
             placeholder: this.options.input_placeholder || "",
         };
         var is_folded = (channel.state === 'folded');
-        this.chat_window = new ChatWindow(this, channel.id, channel.name, is_folded, channel.message_unread_counter, options);
+        this.chat_window = new ChatWindow(this, channel.id, channel.name, is_folded, channel.message_unread_counter, options, this.is_transfer);
         this.chat_window.appendTo($('body')).then(function () {
             self.chat_window.$el.css({right: 0, bottom: 0});
             self.$el.hide();
         });
  
         this.chat_window.on("close_chat_session", this, function () {
-            var input_disabled = this.chat_window.$(".o_chat_composer input").prop('disabled');
+            /*var input_disabled = this.chat_window.$(".o_chat_composer input").prop('disabled');
             var ask_fb = !input_disabled && _.find(this.messages, function (msg) {
                 return msg.id !== '_welcome';
             });
@@ -208,7 +216,8 @@ var LivechatButton = Widget.extend({
                 this.chat_window.toggle_fold(false);
             } else {
                 this.close_chat();
-            }
+            }*/
+            this.close_chat();
         });
         this.chat_window.on("post_message", this, function (message) {
             self.send_message(message).fail(function (error, e) {
@@ -225,18 +234,18 @@ var LivechatButton = Widget.extend({
                 self.chat_window.update_unread(0);
             }
         }, 100));
-    console.log("#__________________________________open_chat_window_____________________________________#");
+    //console.log("#__________________________________open_chat_window_____________________________________#");
     },
 
     close_chat: function () {
-        console.log("|__________________________________close_chat_____________________________________|");
+        //console.log("|__________________________________close_chat_____________________________________|");
         this.chat_window.destroy();
         utils.set_cookie('im_livechat_session', "", -1); // remove cookie
-        console.log("#__________________________________close_chat_____________________________________#");
+        //console.log("#__________________________________close_chat_____________________________________#");
     },
 
     send_message: function (message) {
-        console.log("|__________________________________send_message_____________________________________|");
+        //console.log("|__________________________________send_message_____________________________________|");
         var self = this;
         return session
             .rpc("/chat_web/chat_post", {uuid: this.channel.uuid, message_content: message.content, attachment_ids: message.attachment_ids})
@@ -245,11 +254,11 @@ var LivechatButton = Widget.extend({
                 self.chat_window.set('attachment_ids', []);
                 self.chat_window.render_attachments();
             });
-        console.log("#__________________________________send_message_____________________________________#");
+        //console.log("#__________________________________send_message_____________________________________#");
     },
 
     add_message: function (data, options) {
-        console.log("|__________________________________add_message_____________________________________|");
+        //console.log("|__________________________________add_message_____________________________________|");
         var msg = {
             id: data.id,
             attachment_ids: data.attachment_ids,
@@ -282,17 +291,17 @@ var LivechatButton = Widget.extend({
         } else {
             this.messages.push(msg);
         }
-    console.log("#__________________________________add_message_____________________________________#");
+    //console.log("#__________________________________add_message_____________________________________#");
     },
 
     render_messages: function () {
-        console.log("|__________________________________render_messages_____________________________________|");
+        //console.log("|__________________________________render_messages_____________________________________|");
         var should_scroll = !this.chat_window.folded && this.chat_window.thread.is_at_bottom();
         this.chat_window.render(this.messages);
         if (should_scroll) {
             this.chat_window.thread.scroll_to();
         }
-        console.log("#__________________________________render_messages_____________________________________#");
+        //console.log("#__________________________________render_messages_____________________________________#");
     },
 
     send_welcome_message: function () {

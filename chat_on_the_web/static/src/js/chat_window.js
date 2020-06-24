@@ -39,8 +39,9 @@ return Widget.extend({
 
     },
 
-    init: function (parent, channel_id, title, is_folded, unread_msgs, options) {
+    init: function (parent, channel_id, title, is_folded, unread_msgs, options, is_transfer) {
         this._super(parent);
+        this.is_transfer = is_transfer;
         this.title = title;
         this.channel_id = channel_id;
         this.folded = is_folded;
