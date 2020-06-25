@@ -18,7 +18,8 @@
 
                         <div t-if='!widget.options.input_less' class="o_chat_composer o_chat_mini_composer">
 
-                            <t t-if="widget.is_transfer">
+                            <!--Si el chat se encuentra en el medio de pago por transferencia, se permite adjuntar archivos-->
+                            <t t-if="widget.is_transfer and widget.is_set_perm_user">
                                 <input class="o_composer_text_field" t-att-placeholder="widget.options.placeholder" style="width: 88%"/>
                                 <button class="btn btn-sm btn-icon fa fa-paperclip o_composer_button_add_attachment" type="button" style="font-size: 1.3em;"/>
                             </t>

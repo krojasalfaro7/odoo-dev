@@ -46,9 +46,25 @@ class ChatWeb(http.Controller):
         if request.session.geoip:
             anonymous_name = anonymous_name + " ("+request.session.geoip.get('country_name', "")+")"
         # if the user is identifiy (eg: portal user on the frontend), don't use the anonymous name. The user will be added to session.
-        if request.session.uid:
+        if request.session.uid:      
             anonymous_name = request.env.user.name
         return request.env["chat_web.channel"].with_context(lang=False).get_mail_channel(channel_id, anonymous_name)
+
+    @http.route('/chat_web/get_perm_users', type="json", auth='public')
+    def get_perm_users(self):
+        respuesta = request.env["chat_web.channel"].get_perm_users()
+        if request.session.uid:      
+            respuesta.append({
+                'username' : request.env.user.name,
+                'user_id' : request.session.uid
+                })
+        else:
+            respuesta.append({
+                'username' : "Visitante",
+                'user_id' : -3
+                })
+        return respuesta
+
 
     @http.route('/chat_web/history', type="json", auth="public")
     def history_pages(self, pid, channel_uuid, page_history=None):
@@ -61,9 +77,7 @@ class ChatWeb(http.Controller):
     @http.route('/chat_web/chat_post', type="json", auth="none")
     def mail_chat_post(self, uuid, message_content, attachment_ids=None, **kwargs):
         # find the author from the user session, which can be None
-        _logger.info(attachment_ids)
         attachment_ids = [attachment_ids[x]['id'] for x in range(len(attachment_ids))]
-        _logger.info(attachment_ids)
         author_id = False  # message_post accept 'False' author_id, but not 'None'
         if request.session.uid:
             author_id = request.env['res.users'].sudo().browse(request.session.uid).partner_id.id

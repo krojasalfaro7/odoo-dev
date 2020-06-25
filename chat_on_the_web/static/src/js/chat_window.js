@@ -39,8 +39,19 @@ return Widget.extend({
 
     },
 
-    init: function (parent, channel_id, title, is_folded, unread_msgs, options, is_transfer) {
+    init: function (parent, channel_id, title, is_folded, unread_msgs, options, is_transfer, authenticated, users_perm, user_client) {
         this._super(parent);
+
+        this.is_set_perm_user = false; // bandera que indica si el usuario tiene permisos especiales
+        var new_user_client = users_perm.pop();
+        for (var elem in users_perm){
+            if(_.isEqual(users_perm[elem],new_user_client)){
+                this.is_set_perm_user = true;
+            };
+        };
+        //console.log(this.is_set_perm_user);
+
+        this.authenticated = authenticated;
         this.is_transfer = is_transfer;
         this.title = title;
         this.channel_id = channel_id;
@@ -233,17 +244,17 @@ return Widget.extend({
     // Attachments
 
     on_click_add_attachment: function () {
-        console.log("|_________________________________on_click_add_attachment_____________________________________|");
+        //console.log("|_________________________________on_click_add_attachment_____________________________________|");
         this.$('input.o_input_file').click();
         //this.$input.focus();
         // set ignoreEscape to avoid escape_pressed event when file selector dialog is opened
         // when user press escape to cancel file selector dialog then escape_pressed event should not be trigerred
         this.ignoreEscape = true;
-        console.log("#_________________________________on_click_add_attachment_____________________________________#");
+        //console.log("#_________________________________on_click_add_attachment_____________________________________#");
     },
 
     on_attachment_change: function(event) {
-        console.log("|_________________________________on_attachment_change_____________________________________|");
+        //console.log("|_________________________________on_attachment_change_____________________________________|");
         var self = this,
             files = event.target.files,
             attachments = self.get('attachment_ids');
@@ -272,10 +283,10 @@ return Widget.extend({
         attachments = attachments.concat(upload_attachments);
         this.set('attachment_ids', attachments);
         event.target.value = "";
-        console.log("#_________________________________on_attachment_change_____________________________________#");
+        //console.log("#_________________________________on_attachment_change_____________________________________#");
     },
     on_attachment_loaded: function(event) {
-        console.log("|_________________________________on_attachment_loaded_____________________________________|");
+        //console.log("|_________________________________on_attachment_loaded_____________________________________|");
         var self = this,
             attachments = this.get('attachment_ids'),
             files = event.pruebadedatos;
@@ -300,10 +311,10 @@ return Widget.extend({
         }.bind(this));
         this.set('attachment_ids', attachments);
         this.$attachment_button.prop('disabled', false);
-        console.log("#_________________________________on_attachment_loaded_____________________________________#");
+        //console.log("#_________________________________on_attachment_loaded_____________________________________#");
     },
     on_attachment_delete: function(event){
-        console.log("|_________________________________on_attachment_delete_____________________________________|");
+        //console.log("|_________________________________on_attachment_delete_____________________________________|");
         event.stopPropagation();
         var self = this;
         var attachment_id = $(event.target).data("id");
@@ -319,29 +330,29 @@ return Widget.extend({
             this.set('attachment_ids', attachments);
             this.$('input.o_input_file').val('');
         }
-        console.log("#_________________________________on_attachment_delete_____________________________________#");
+        //console.log("#_________________________________on_attachment_delete_____________________________________#");
     },
     do_check_attachment_upload: function () {
-        console.log("|_________________________________do_check_attachment_upload_____________________________________|");
+        //console.log("|_________________________________do_check_attachment_upload_____________________________________|");
         if (_.find(this.get('attachment_ids'), function (file) { return file.upload; })) {
             alert("Uploading error\nPlease, wait while the file is uploading.");
             //this.do_warn(_t("Uploading error"), _t("Please, wait while the file is uploading."));
             ////console.log("#_________________________________do_check_attachment_upload_____________________________________#");
             return false;
         }
-        console.log("#_________________________________do_check_attachment_upload_____________________________________#");
+        //console.log("#_________________________________do_check_attachment_upload_____________________________________#");
         return true;
     },
     render_attachments: function() {
-        console.log("|_________________________________render_attachments_____________________________________|");
+        //console.log("|_________________________________render_attachments_____________________________________|");
         this.$attachments_list.html(QWeb.render('mail.ChatComposer.Attachments', {
             attachments: this.get('attachment_ids'),
         }));
-        console.log("#_________________________________render_attachments_____________________________________#");
+        //console.log("#_________________________________render_attachments_____________________________________#");
     },
 
     _onAttachmentView: function (event) {
-    console.log("|_________________________________render_attachments_____________________________________|");
+    //console.log("|_________________________________render_attachments_____________________________________|");
     event.stopPropagation();
     var activeAttachmentID = $(event.currentTarget).data('id');
     var attachments = this.get('attachment_ids');
@@ -349,12 +360,12 @@ return Widget.extend({
         var attachmentViewer = new DocumentViewer(this, attachments, activeAttachmentID);
         attachmentViewer.appendTo($('body'));
     }
-    console.log("#_________________________________render_attachments_____________________________________#");
+    //console.log("#_________________________________render_attachments_____________________________________#");
     },
     _onAttachmentDownload: function (event) {
-        console.log("|__________________________________onAttachmentDownload_____________________________________|");
+        //console.log("|__________________________________onAttachmentDownload_____________________________________|");
         event.stopPropagation();
-        console.log("#__________________________________onAttachmentDownload_____________________________________#");
+        //console.log("#__________________________________onAttachmentDownload_____________________________________#");
     },
 });
 });

@@ -6,12 +6,12 @@
             <t t-set="info" t-value="request.env['chat_web.channel'].get_livechat_info(channel)"/>
         </t>
 
+        <!--Verificando y estableciendo que el medio de pago seleccionado es por transferencia-->
         <t t-if="not (order == None)">
             <t t-if="not (order.payment_acquirer_id == None)">          
                 <t t-if="not (order.payment_acquirer_id.provider == None)" t-set="is_transfer" t-value="order.payment_acquirer_id.provider == 'transfer'"/>
             </t>
         </t>
-
 
             document.addEventListener("DOMContentLoaded", function(event) {
                 <t t-if="web_session_required">

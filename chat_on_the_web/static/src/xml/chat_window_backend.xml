@@ -43,11 +43,11 @@
             </div>-->
 
             <t t-foreach="channels" t-as="channel">
-                <!--<t t-set="counter" t-value="channel.is_chat ? channel.unread_counter : channel.needaction_counter"/>-->
+                <t t-set="counter" t-value="channel.is_chat ? channel.unread_counter : channel.needaction_counter"/>
 
                 <!--<div t-if="channel.type === channel_type" t-att-data-channel-id="channel.id" t-att-title="channel.name" t-attf-class="o_mail_chat_channel_item #{channel.unread_counter ? ' o_unread_message' : ''} #{(active_channel_id == channel.id) ? 'o_active': ''}">-->
 
-                <div t-if="channel.type === channel_type" t-att-data-channel-id="channel.id" t-att-title="channel.name" class="o_mail_chat_channel_item">
+                <div t-if="channel.type === channel_type" t-att-data-channel-id="channel.id" t-att-title="channel.name" t-attf-class="o_mail_chat_channel_item #{channel.unread_counter ? ' o_unread_message' : ''} #{(active_channel_id == channel.id) ? 'o_active': ''}">
 
 
                     <span class="o_channel_name">
@@ -63,11 +63,7 @@
 
                     </span>
 
-
-
-                    <!--<t t-call="mail.chat.SidebarNeedaction"/>-->
-
-
+                    <t t-call="mail.chat.SidebarNeedaction"/>
 
                     <span t-if="!channel.group_based_subscription" t-attf-class="fa fa-times o_mail_partner_unpin" title="Dejar este canal o conversación" t-att-data-channel-id="channel.id"/>
                 </div>

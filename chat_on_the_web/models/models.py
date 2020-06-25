@@ -6,6 +6,9 @@ from datetime import datetime, timedelta
 
 from odoo import api, fields, models, modules, tools
 
+import logging
+_logger = logging.getLogger(__name__)
+
 class ChatWebChannel(models.Model):
     """ Livechat Channel
         Define a communication channel, which can be accessed with 'script_external' (script tag to put on
@@ -53,6 +56,7 @@ class ChatWebChannel(models.Model):
     user_ids = fields.Many2many('res.users', 'im_livechat_channel_im_user', 'channel_id', 'user_id', string='Operators', default=_default_user_ids)
     channel_ids = fields.One2many('mail.channel', 'livechat_channel_id', 'Sessions')
     rule_ids = fields.One2many('chat_web.channel.rule', 'channel_id', 'Rules')
+    user_perm_ids = fields.Many2many('res.users', 'im_livechat_channel_im_user_perm', 'channel_id', 'user_id', string='Permisos')
 
 
     @api.one
@@ -105,6 +109,11 @@ class ChatWebChannel(models.Model):
         self.ensure_one()
         return self.sudo().user_ids.filtered(lambda user: user.im_status == 'online')
 
+    @api.multi
+    def get_available_perm_users(self):
+        self.ensure_one()
+        return self.sudo().user_perm_ids
+
     @api.model
     def get_mail_channel(self, livechat_channel_id, anonymous_name):
         """ Return a mail.channel given a livechat channel. It creates one with a connected operator, or return false otherwise
@@ -138,6 +147,23 @@ class ChatWebChannel(models.Model):
         })
         mail_channel._broadcast([operator_partner_id])
         return mail_channel.sudo().with_context(im_livechat_operator_partner_id=operator_partner_id).channel_info()[0]
+
+    #Metodo para obtener los usuarios que tienen permiso para subir y enviar archivos
+    @api.model
+    def get_perm_users(self):
+
+        users = self.sudo().browse(1).get_available_perm_users()
+        users_dict = list()
+        for user in users:
+            users_dict.append({
+            'username': user.name,
+            'user_id': user.id,
+            })
+            
+        # choose the res.users operator and get its partner id
+        #user = random.choice(users)
+        return users_dict
+
 
     @api.model
     def get_channel_infos(self, channel_id):

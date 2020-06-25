@@ -41,9 +41,17 @@ var LivechatButton = Widget.extend({
     },
 
     init: function (parent, server_url, options, is_transfer) {
+
         //console.log("|_________________________________init_____________________________________|");
         this._super(parent);
-        this.is_transfer = is_transfer == "True" ? true : false;
+        this.is_transfer = is_transfer == "True" ? true : false; // Variable que informa cuando el metodo de pago es por transferencia
+        this.authenticated = null; // Variable que informa cuando el usuario es autenticado o no
+        //this.users_perm = null; // Permiso especial de los usuarios autenticados para enviar y subir archivos
+        var self = this;
+        //Obteniendo informacion de los usuarios con permisos especiales y del cliente actual
+        this.users_perm = session.rpc('/chat_web/get_perm_users').then(function(users){
+            self.users_perm = users; //Tengo que hacer una prueba para ver cual es el que de verdad esta dando el valor
+            return users;}); //Tengo que hacer una prueba para ver cual es el que de verdad esta dando el valor
         this.options = _.defaults(options || {}, {
             input_placeholder: _t('Pregunta algo ...'),
             default_username: _t("Visitante"),
@@ -63,7 +71,7 @@ var LivechatButton = Widget.extend({
         //this.AttachmentDataSet = new data.DataSetSearch(this, 'ir.attachment', this.context);
         this.fileupload_id = _.uniqueId('o_chat_fileupload');
         this.set('attachment_ids', this.options.attachment_ids || []);
-        //console.log(this.options);
+
         //console.log("#_________________________________init_____________________________________#");
     },
 
@@ -91,7 +99,6 @@ var LivechatButton = Widget.extend({
 
     start: function () {
         //console.log("|_________________________________start_____________________________________|");
-        //console.log(Math.round(Math.random()*(900-1)+1));
         //this.$el.text(this.options.button_text);
         //Editando el $el para que aparezca el icono de sobre en vez de un boton con un texto.
         this.$el.append("<input type='image' src='/chat_on_the_web/static/src/img/icono_mensaje.png' class='o_input_sobre'></input>");
@@ -116,6 +123,7 @@ var LivechatButton = Widget.extend({
     },
     _on_notification: function(notification){
         //console.log("|__________________________________on_notification_____________________________________|");
+        //console.log(notification);
         if (this.channel && (notification[0] === this.channel.uuid)) {
             if(notification[1]._type === "history_command") { // history request
                 var cookie = utils.get_cookie(LIVECHAT_COOKIE_HISTORY);
@@ -163,6 +171,8 @@ var LivechatButton = Widget.extend({
         var def;
         this.opening_chat = true;
         clearTimeout(this.auto_popup_timeout);
+
+
         if (cookie) {
             def = $.when(JSON.parse(cookie));
         } else {
@@ -174,7 +184,6 @@ var LivechatButton = Widget.extend({
         }
         def.then(function (channel) {
             if (!channel || !channel.operator_pid) {
-                //alert(_t("Parece que ninguno de nuestros colaboradores está disponible. Vuelve a intentarlo más tarde."));
                 alert(_t(operators_online));
             } else {
                 self.channel = channel;
@@ -195,28 +204,28 @@ var LivechatButton = Widget.extend({
 
     open_chat_window: function (channel) {
         //console.log("|__________________________________open_chat_window_____________________________________|");
+
+        console.log(channel);
+        this.authenticated = channel.anonymous_name == "Visitante" ? false : true; //Estableciendo si esta o no autenticado el usuario
         var self = this;
         var options = {
             display_stars: false,
             placeholder: this.options.input_placeholder || "",
         };
         var is_folded = (channel.state === 'folded');
-        this.chat_window = new ChatWindow(this, channel.id, channel.name, is_folded, channel.message_unread_counter, options, this.is_transfer);
+
+        //Creando el json que identifica al cliente actual
+        var user_client = {
+            username : channel.anonymous_name,
+            user_id : channel.anonymous_id,
+        };
+
+        this.chat_window = new ChatWindow(this, channel.id, channel.name, is_folded, channel.message_unread_counter, options, this.is_transfer, this.authenticated, this.users_perm, user_client);
         this.chat_window.appendTo($('body')).then(function () {
             self.chat_window.$el.css({right: 0, bottom: 0});
             self.$el.hide();
         });
- 
         this.chat_window.on("close_chat_session", this, function () {
-            /*var input_disabled = this.chat_window.$(".o_chat_composer input").prop('disabled');
-            var ask_fb = !input_disabled && _.find(this.messages, function (msg) {
-                return msg.id !== '_welcome';
-            });
-            if (ask_fb) {
-                this.chat_window.toggle_fold(false);
-            } else {
-                this.close_chat();
-            }*/
             this.close_chat();
         });
         this.chat_window.on("post_message", this, function (message) {
@@ -234,6 +243,7 @@ var LivechatButton = Widget.extend({
                 self.chat_window.update_unread(0);
             }
         }, 100));
+
     //console.log("#__________________________________open_chat_window_____________________________________#");
     },
 
