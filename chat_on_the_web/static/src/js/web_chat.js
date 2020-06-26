@@ -205,7 +205,7 @@ var LivechatButton = Widget.extend({
     open_chat_window: function (channel) {
         //console.log("|__________________________________open_chat_window_____________________________________|");
 
-        console.log(channel);
+        //console.log(channel);
         this.authenticated = channel.anonymous_name == "Visitante" ? false : true; //Estableciendo si esta o no autenticado el usuario
         var self = this;
         var options = {
