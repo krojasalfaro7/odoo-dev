@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_exchange_rate_on_the_web_exchange_rate_on_the_web,exchange_rate_on_the_web.exchange_rate_on_the_web,model_exchange_rate_on_the_web_exchange_rate_on_the_web,,1,0,0,0

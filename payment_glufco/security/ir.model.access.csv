@@ -1,2 +1,0 @@
-id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
-access_payment_glufco_payment_glufco,payment_glufco.payment_glufco,model_payment_glufco_payment_glufco,,1,0,0,0
