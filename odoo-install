@@ -1,0 +1,104 @@
+ODOO 11 para Debian 10
+
+1) Agregar un nuevo usuario y estableciendo su clave:
+
+$ sudo useradd -m -g sudo -s /bin/bash odev11 --home=/opt/odev11
+$ sudo passwd
+
+2) Instalar git, npm, postgresql, python3-dev:
+
+$ sudo apt-get install git npm python3-dev postgresql 
+
+3) Creando un enlace simbolico de nodejs a node:
+
+$ sudo ln -s /usr/bin/nodejs /usr/bin/node
+
+4) Instalando el compilador de less
+
+$ sudo npm install -g less less-plugin-clean-css
+
+5) Descargar el codigo fuente o transferirlos a la ruta del servidor, en este caso (/opt/odev11).
+
+6) Crear usuario de la base de datos:
+
+$ createuser --createdb --username postgres --no-createrole --no-superuser --pwprompt odev11
+Ingresar clave (recomiendo utilizar la misma que el nombre "odev11")
+
+7) Establecer Python3 por defecto:
+
+$ sudo update-alternatives --install /usr/bin/python python /usr/bin/python3.7 1 (O la version que este en ese momento intalada)
+$ sudo update-alternatives --config python
+
+8) Instalar virtual env de python3:
+
+$ sudo apt-get install python3-venv
+
+9) Crear un entorno virtual de python para odoo (En caso de que vayan a haber varias versiones de odoo con dependencias y versiones diferentes, o algun paquete de python que se vaya a instalar en un futuro que no dane el actual):
+
+En el directorio raiz del entorno (/opt/odev11/):
+$ sudo python -m venv nombre_del_entorno (virt, para este caso)
+
+Activar el entorno:
+$ source virt/bin/activate (deactivate, para desactivar)
+
+11) Instalar las dependencias de python:
+
+$ pip3 install -r odoo/requirements.txt
+
+$ cd odoo
+$ python setup.py install (En caso de error de dependencia, instalar manaulmente las faltan y ejecutar nuevamente, o llamar python desde la ruta del entorno virtual EJ: ../virt/bin/python setup.py install)
+
+(Opcional): volver a ejecutar => $ pip3 install -r odoo/requirements.txt
+
+12) Correr o, en efecto, intentar correr odoo/odoo-bin:
+
+Seguramente de error de varias dependencias y modulos de python, asi que se deben instalar manualmente tantas veces ya esten todas. 
+
+Lista de algunos que podrian faltar:
+
+pip3 install passlib
+pip3 install babel
+pip3 install lxml
+pip3 install decorator
+pip3 install six
+
+En caso de error con psycopg2:
+$ sudo apt-get install python-psycopg2
+$ sudo apt-get install libpq-dev
+$ pip3 install psycopg2
+
+pip3 install image (para PIL)
+pip3 install Werkzeug==0.11.15
+pip3 install psutil
+pip3 install urllib3
+pip3 install chardet
+pip3 install certifi
+pip3 install idna
+pip3 install jinja2
+pip3 install html2text
+pip3 install docutils
+pip3 install num2words
+pip3 install phonenumbers
+
+Problema con el Wkhtmltopdf:
+
+$ sudo apt-get install libfontconfig1 libxrender1
+
+$ wget https://github.com/wkhtmltopdf/wkhtmltopdf/releases/download/0.12.4/wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+$ tar xvf wkhtmltox-0.12.4_linux-generic-amd64.tar.xz
+$ mv wkhtmltox/bin/wkhtmlto* /usr/bin/
+$ ln -nfs /usr/bin/wkhtmltopdf /usr/local/bin/wkhtmltopdf
+
+13) Generar archivo de configuracion:
+
+$ odoo/odoo-bin -s
+
+
+
+
+
+
+
+
+
+
