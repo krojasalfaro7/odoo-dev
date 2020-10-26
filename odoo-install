@@ -102,10 +102,60 @@ $ odoo/odoo-bin -s
 
 
 
+=========================================================================================================================
+ODOO 14 para Debian 10 ARREGLAR ESTO
+
+1) Agregar un nuevo usuario y estableciendo su clave:
+
+$ sudo useradd -m -g sudo -s /bin/bash odev14 --home=/opt/odev14
+$ sudo passwd odev14
+
+2) Crear un entorno virtual de python para odoo (En caso de que vayan a haber varias versiones de odoo con dependencias y versiones diferentes, o algun paquete de python que se vaya a instalar en un futuro que no dane el actual):
+
+En el directorio raiz del entorno (/opt/odev11/):
+$ sudo python -m venv nombre_del_entorno (virt, para este caso)
+
+Activar el entorno:
+$ source virt/bin/activate (deactivate, para desactivar)
 
 
 
+sudo apt-get install -y python3 python3-pip
 
+sudo apt-get install -y libxml2-dev libxslt1-dev zlib1g-dev libsasl2-dev \
+libldap2-dev libssl-dev python-dev python3-dev build-essential libffi-dev \
+zlib1g-dev python-pip gcc
 
+sudo apt-get install -y python-pypdf2 python-dateutil python-feedparser \
+python-ldap python-libxslt1 python-lxml python-mako python-openid \
+python-psycopg2 python-babel python-pychart python-pydot python-pyparsing \
+python-reportlab python-simplejson python-tz python-vatnumber python-vobject \
+python-webdav python-werkzeug python-xlwt python-yaml python-zsi \
+python-docutils python-psutil python-mock python-unittest2 python-jinja2 \
+python-decorator python-requests python-passlib python-pil
+
+sudo pip3 install PyPDF2 Werkzeug==0.11.15 python-dateutil reportlab \
+psycopg2-binary
+
+sudo apt-get install -y npm
+sudo ln -s /usr/bin/nodejs /usr/bin/node
+sudo npm install -g less less-plugin-clean-css
+sudo apt-get install -y node-less
+
+sudo adduser --system --home=/opt/odoo --group odoo
+sudo apt-get install postgresql
+sudo su - postgres
+createuser --createdb --username postgres --no-createrole --no-superuser --pwprompt odoo
+psql
+ALTER USER odoo WITH SUPERUSER;
+\q
+exit
+
+sudo su - odoo -s /bin/bash
+git clone https://www.github.com/odoo/odoo --depth 1 --branch 14.0 --single-branch . 
+sudo pip3 install -r requirements.txt
+exit
+
+sudo -Hu odoo ./odoo-bin
 
 
