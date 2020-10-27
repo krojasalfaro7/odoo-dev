@@ -1,0 +1,26 @@
+<odoo>
+  <data>
+
+    <!-- Vista de Arbol del modelo planeta.huerto -->
+    <record model="ir.ui.view" id="planeta_huerto_list">
+      <field name="name">planeta.huerto list</field>
+      <field name="model">planeta.huerto</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="archivo_json"/>
+        </tree>
+      </field>
+    </record>
+
+    <!-- Accion del modelo planeta.huerto -->
+    <record model="ir.actions.act_window" id="planeta_huerto_action_window">
+      <field name="name">Planeta Huerto</field>
+      <field name="res_model">planeta.huerto</field>
+      <field name="view_mode">tree,form</field>
+    </record>
+
+    <menuitem name="Importar JSON" id="planeta_huerto_menu_importar_json" parent="sale.sale_order_menu"
+              action="planeta_huerto_action_window"/>
+
+  </data>
+</odoo>
