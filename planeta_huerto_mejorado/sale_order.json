@@ -1,0 +1,44 @@
+{
+
+"version": "1.0",
+"data": {
+"id": 8471018,
+"status": "sent",
+"date": "2019-03-24T14:50:48+0200",
+"payment_method": "credit-card",
+"customer": {
+"name": "Fulanito",
+"surname": "Gómez Gómez",
+"email": "fgg@gmail.com",
+"phone": "666555444",
+"nif": "ESA12345674",
+"address": {
+"street": "Calle de la Chancla n12",
+"city": "Durango",
+"province": "BIZKAIA",
+"postal_code": "48200",
+"country_code": "ES"
+}
+},
+"lines": [
+{
+"sku": 123750,
+"name": "ImseVimse Salva-Slip Algod\\u00f3n Org\\u00e1nico 3 Unidades",
+"barcode": [
+"7392871180107"
+],
+"units": 4,
+"price_unit": 1295
+},
+{
+"sku": 123753,
+"name": "ImseVimse Salva-Slip Algod\\u00f3n Org\\u00e1nico 6 Unidades",
+"barcode": [
+"7392871181609"
+],
+"units": 3,
+"price_unit": 1395
+}
+]
+}
+}

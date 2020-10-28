@@ -1,0 +1,19 @@
+<odoo>
+  <data>
+
+    <!-- Accion del servidor que llama a la funcion write_sale_order -->
+    <record id="call_write_sale_order_from_json" model="ir.actions.server">
+        <field name="name">Llamada para creacion del pedido a traves de JSON</field>
+        <field name="model_id" ref="model_sale_order"/>
+        <field name="state">code</field>
+        <field name="code">action = model.write_sale_order()</field>
+    </record>
+
+    <!--Menu que llama a la accion para escribir pedidos desde el .json-->
+    <menuitem name="Importar JSON"
+              id="planeta_huerto_menu_importar_json"
+              parent="sale.sale_order_menu"
+              action="call_write_sale_order_from_json"/>
+
+  </data>
+</odoo>
