@@ -4,7 +4,7 @@
     <!-- Accion del servidor que llama a la funcion write_sale_order -->
     <record id="call_write_sale_order_from_json" model="ir.actions.server">
         <field name="name">Llamada para creacion del pedido a traves de JSON</field>
-        <field name="model_id" ref="model_sale_order"/>
+        <field name="model_id" ref="model_planeta_huerto"/>
         <field name="state">code</field>
         <field name="code">action = model.write_sale_order()</field>
     </record>

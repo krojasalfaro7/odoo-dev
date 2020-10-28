@@ -6,7 +6,7 @@ import os.path
 
 class PlanetaHuerto(models.Model):
 
-    _inherit = 'sale.order'
+    _name = 'planeta.huerto'
 
     # Creacion del pedido
     @api.model
